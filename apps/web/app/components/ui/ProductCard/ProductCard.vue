@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-md hover:shadow-lg flex flex-col"
+    class="rounded-md hover:shadow-lg flex flex-col min-w-0"
     data-testid="product-card"
     :class="{ 'border border-neutral-200': configuration?.cardBorders }"
   >
@@ -61,7 +61,7 @@
     </div>
 
     <div
-      class="p-2 border-t border-neutral-200 typography-text-sm flex flex-col flex-auto"
+      class="p-2 border-t border-neutral-200 typography-text-sm flex flex-col flex-auto min-w-0 overflow-hidden"
       :class="{
         'items-center': configuration?.contentAlignment === 'center',
         'items-end': configuration?.contentAlignment === 'right',
@@ -73,9 +73,10 @@
           <SfLink
             :tag="NuxtLink"
             :to="productPath"
-            class="no-underline line-clamp-2"
+            class="no-underline line-clamp-2 w-full min-w-0 [overflow-wrap:anywhere]"
             variant="secondary"
             data-testid="productcard-name"
+            :title="name"
           >
             {{ name }}
           </SfLink>
@@ -83,7 +84,7 @@
         <template v-if="key === 'manufacturer' && configuration?.fields?.manufacturer">
           <div
             v-if="manufacturer"
-            class="mb-1 typography-text-xs text-neutral-500"
+            class="mb-1 typography-text-xs text-neutral-500 max-w-full truncate"
             data-testid="productcard-manufacturer"
           >
             {{ manufacturer.externalName }}
