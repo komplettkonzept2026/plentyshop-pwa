@@ -12,6 +12,9 @@ import type { Product, CanonicalAlternate } from '@plentymarkets/shop-api';
 const ORGANIZATION_LOGO =
   'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg';
 
+const SCHEMA_IN_STOCK = 'https://schema.org/InStock';
+const SCHEMA_OUT_OF_STOCK = 'https://schema.org/OutOfStock';
+
 const stripHtml = (value: string | undefined | null): string => {
   if (!value) return '';
   return value
@@ -21,6 +24,27 @@ const stripHtml = (value: string | undefined | null): string => {
 };
 
 const normalizeDomain = (domain: string): string => domain.replace(/\/$/, '');
+
+/**
+ * Prefer Plenty SEO mappedAvailability; otherwise derive from stock / salable state.
+ * Google Product rich results require a non-empty offers.availability (or review/aggregateRating).
+ */
+const resolveOfferAvailability = (product: Product): string => {
+  const mapped = productSeoSettingsGetters.getMappedAvailability(product)?.trim();
+  if (mapped) return mapped;
+
+  const netStock = (product as Product & { stock?: { net?: number | null } }).stock?.net;
+  if (typeof netStock === 'number') {
+    return netStock > 0 ? SCHEMA_IN_STOCK : SCHEMA_OUT_OF_STOCK;
+  }
+
+  if (productGetters.isSalable(product)) {
+    return SCHEMA_IN_STOCK;
+  }
+
+  // Priced PDP without SEO availability or stock: still emit a valid Schema.org value.
+  return SCHEMA_IN_STOCK;
+};
 
 /**
  * @description Composable managing meta data
@@ -125,10 +149,12 @@ export const useStructuredData: useStructuredDataReturn = () => {
       stripHtml(productGetters.getName(product));
 
     const itemCondition = productSeoSettingsGetters.getConditionOfItem(product);
-    const availability = productSeoSettingsGetters.getMappedAvailability(product);
     const priceValue = Number(price.value);
     const priceCurrency = productGetters.getSpecialPriceCurrency(product) || 'EUR';
-    const hasOffer = Number.isFinite(priceValue) && priceValue > 0 && Boolean(availability);
+    // Offer when priced; availability falls back to stock/salable so Rich Results stay valid
+    // even when Plenty SEO mappedAvailability is empty.
+    const hasOffer = Number.isFinite(priceValue) && priceValue > 0;
+    const availability = hasOffer ? resolveOfferAvailability(product) : '';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const metaObject: Record<string, any> = {

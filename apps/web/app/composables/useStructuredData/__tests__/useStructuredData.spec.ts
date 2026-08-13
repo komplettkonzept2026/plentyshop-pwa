@@ -53,6 +53,7 @@ vi.mock('@plentymarkets/shop-api', () => ({
     getSpecialPriceCurrency: vi.fn(() => 'EUR'),
     getTotalReviews: vi.fn(() => 0),
     getUrlPath: vi.fn(() => 'abb-acs30108p73de-frequenzumrichter-umrichter-acs301-08p7-3de'),
+    isSalable: vi.fn(() => true),
   },
   productSeoSettingsGetters: {
     getConditionOfItem: vi.fn(() => 'https://schema.org/UsedCondition'),
@@ -215,6 +216,36 @@ describe('useStructuredData', () => {
 
     const structuredData = getStructuredDataByKey('ld-product');
     expect(structuredData.offers).toBeUndefined();
+  });
+
+  it('emits Offer with stock-based availability when SEO mappedAvailability is empty', () => {
+    vi.mocked(productSeoSettingsGetters.getMappedAvailability).mockReturnValue('');
+
+    const { setProductMetaData } = useStructuredData();
+    setProductMetaData({
+      texts: { description: 'Test description' },
+      stock: { net: 2 },
+    } as never);
+
+    const structuredData = getStructuredDataByKey('ld-product');
+    expect(structuredData.offers).toBeDefined();
+    expect(structuredData.offers.availability).toBe('https://schema.org/InStock');
+    expect(structuredData.offers.price).toBe('589.00');
+    expect(structuredData.offers.hasMerchantReturnPolicy).toBeDefined();
+    expect(structuredData.offers.shippingDetails).toBeDefined();
+  });
+
+  it('emits OutOfStock when SEO availability is empty and net stock is zero', () => {
+    vi.mocked(productSeoSettingsGetters.getMappedAvailability).mockReturnValue('');
+
+    const { setProductMetaData } = useStructuredData();
+    setProductMetaData({
+      texts: { description: 'Test description' },
+      stock: { net: 0 },
+    } as never);
+
+    const structuredData = getStructuredDataByKey('ld-product');
+    expect(structuredData.offers.availability).toBe('https://schema.org/OutOfStock');
   });
 
   it('includes aggregateRating when reviewCount is positive', () => {
