@@ -37,7 +37,7 @@
           class="active:scale-95 transition-transform duration-200 flex-shrink-0"
         >
           <img
-            src="/_nuxt-plenty/images/ankaufsformular-logo.png"
+            :src="ankaufsformularLogoSrc"
             alt="Ankaufsformular"
             class="h-[40px] lg:h-[50px] min-[1152px]:h-[58px] min-[1280px]:h-[84px] min-[1367px]:h-[110px] max-w-[62px] lg:max-w-[78px] min-[1152px]:max-w-[90px] min-[1280px]:max-w-[128px] min-[1367px]:max-w-[172px] w-auto object-contain transition-all duration-300"
           />
@@ -299,6 +299,9 @@ import LanguageSelector from '~/components/LanguageSelector/LanguageSelector.vue
 import { paths } from '~/utils/paths';
 import { handleLogout } from '~/utils/logout';
 import GoogleTranslate from '~/components/GoogleTranslate.vue';
+
+// Public asset path (dynamic :src avoids Vite treating /_nuxt-plenty/* as a module import).
+const ankaufsformularLogoSrc = '/_nuxt-plenty/images/ankaufsformular-logo.png';
 
 const isLogin = ref(true);
 const { data: cart } = useCart();

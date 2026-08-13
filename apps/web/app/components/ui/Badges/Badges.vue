@@ -1,6 +1,15 @@
 <template>
   <div v-if="haveBadges" data-testid="badges" class="z-[2]">
     <ul>
+      <SfListItem
+        v-if="showNewBadge"
+        size="sm"
+        class="text-xs font-medium select-none rounded-md !w-fit !cursor-default !px-2 mr-2 mb-2 text-white bg-primary-700"
+        data-testid="new-product-badge"
+      >
+        {{ t('product.newBadge') }}
+      </SfListItem>
+
       <template v-if="tagsEnabled && productTags.length > 0">
         <SfListItem
           v-for="(tag, index) in productTags"
@@ -35,8 +44,10 @@
 import { SfListItem } from '@storefront-ui/vue';
 import { type ProductTag, productGetters, tagGetters } from '@plentymarkets/shop-api';
 import type { BadgesProps } from '~/components/ui/Badges/types';
+import { isNewProduct } from '~/utils/product/isNewProduct';
 
 const localePath = useLocalePath();
+const { t } = useI18n();
 
 const { product, useTags = true, useAvailability = false } = defineProps<BadgesProps>();
 const productTags = ref([] as ProductTag[]);
@@ -55,8 +66,11 @@ if (tagsEnabled) {
   productTags.value = tagGetters.getTags(product);
 }
 
+const showNewBadge = computed(() => isNewProduct(product));
+
 const haveBadges = computed(
   () =>
+    showNewBadge.value ||
     (tagsEnabled && productTags.value.length > 0) ||
     (availabilityEnabled && productGetters.getAvailabilityName(product)),
 );

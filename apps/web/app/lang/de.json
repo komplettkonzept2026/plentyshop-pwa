@@ -1016,6 +1016,7 @@
     "lowestPrice": "Niedrigster Preis der letzten 30 Tage: {price}",
     "minimumQuantity": "Minimale Bestellmenge: {count}",
     "moreFromCategory": "Weitere Artikel in dieser Kategorie",
+    "newBadge": "Neu",
     "noReviews": "Es hat noch niemand eine Bewertung für diesen Artikel abgegeben",
     "noReviewsShort": "Keine Bewertungen",
     "notAvailable": "Der Artikel ist nicht verfügbar",
