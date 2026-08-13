@@ -61,10 +61,13 @@
 <script setup lang="ts">
 import { SfDropdown, SfLink, SfIconMoreHoriz } from '@storefront-ui/vue';
 import type { BreadcrumbsProps } from '~/components/ui/Breadcrumbs/types';
+import { buildBreadcrumbListJsonLd } from '~/utils/breadcrumbStructuredData';
 
-defineProps<BreadcrumbsProps>();
+const props = defineProps<BreadcrumbsProps>();
 
 const localePath = useLocalePath();
+const route = useRoute();
+const runtimeConfig = useRuntimeConfig();
 const dropdownOpened = ref(false);
 const close = () => {
   dropdownOpened.value = false;
@@ -74,44 +77,27 @@ const toggle = () => {
 };
 
 const NuxtLink = resolveComponent('NuxtLink');
-const route = useRoute();
-const items = route.path.split('/');
-const itemListElement = [] as Array<unknown>;
-let name = '';
-items.forEach((item, index) => {
-  name += item;
-  if (index === 0) {
-    itemListElement.push({
-      '@type': 'ListItem',
-      position: 1,
-      item: {
-        '@id': '/',
-        name: 'Home',
-      },
-    });
-  } else {
-    itemListElement.push({
-      '@type': 'ListItem',
-      position: index,
-      item: {
-        '@id': `/${name}/`,
-        name: `${item}`,
-      },
-    });
-  }
-});
 
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement,
-};
-useHead({
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify(structuredData),
-    },
-  ],
+const structuredData = computed(() =>
+  buildBreadcrumbListJsonLd({
+    breadcrumbs: props.breadcrumbs,
+    domain: String(runtimeConfig.public.domain || 'https://www.komplett-konzept.de'),
+    currentPath: route.path,
+    localizePath: localePath,
+  }),
+);
+
+useHead(() => {
+  if (!structuredData.value) return {};
+
+  return {
+    script: [
+      {
+        key: 'ld-breadcrumb',
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify(structuredData.value),
+      },
+    ],
+  };
 });
 </script>

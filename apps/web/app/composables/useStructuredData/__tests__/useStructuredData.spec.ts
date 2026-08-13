@@ -3,59 +3,68 @@ import { ref } from 'vue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { productGetters, productSeoSettingsGetters } from '@plentymarkets/shop-api';
 
-const { useHead, useRuntimeConfig, useState, useProductReviews, useProductReviewAverage, useRoute, useLocalePath } =
-  vi.hoisted(() => {
-    return {
-      useHead: vi.fn(),
-      useRuntimeConfig: vi.fn(() => ({
-        public: {
-          domain: 'https://example.com',
-        },
-      })),
-      useState: vi.fn((key: string, init: () => { loading: boolean }) => ref(init())),
-      useProductReviews: vi.fn(),
-      useProductReviewAverage: vi.fn(),
-      useRoute: vi.fn(() => ({
-        path: '/kategorie/neu-eingetroffen/test-product_58645_61987',
-      })),
-      useLocalePath: vi.fn(() => (path: string) => path),
-    };
-  });
+const {
+  useHead,
+  useRuntimeConfig,
+  useState,
+  useProductReviews,
+  useProductReviewAverage,
+  useRoute,
+  useLocalePath,
+  useProductPrice,
+  useModernImage,
+} = vi.hoisted(() => {
+  return {
+    useHead: vi.fn(),
+    useRuntimeConfig: vi.fn(() => ({
+      public: {
+        domain: 'https://www.komplett-konzept.de',
+      },
+    })),
+    useState: vi.fn((key: string, init: () => { loading: boolean }) => ref(init())),
+    useProductReviews: vi.fn(),
+    useProductReviewAverage: vi.fn(),
+    useRoute: vi.fn(() => ({
+      path: '/abb-acs30108p73de-frequenzumrichter-umrichter-acs301-08p7-3de_49565_52884',
+      query: {},
+    })),
+    useLocalePath: vi.fn(() => (path: string) => path),
+    useProductPrice: vi.fn(() => ({
+      price: ref(589),
+      crossedPrice: ref(null),
+    })),
+    useModernImage: vi.fn(() => ({
+      addModernImageExtension: (url: string) => url,
+      addModernImageExtensionForGallery: (images: unknown) => images,
+      getImageForViewport: () => '',
+    })),
+  };
+});
 
 vi.mock('@plentymarkets/shop-api', () => ({
-  categoryTreeGetters: {
-    getName: vi.fn(() => 'Category'),
-  },
   productGetters: {
     getAverageRating: vi.fn(() => 4.5),
-    getCheapestGraduatedPrice: vi.fn(() => 19.99),
-    getCoverImage: vi.fn(() => 'https://example.com/image.jpg'),
-    getCrossedPrice: vi.fn(() => 24.99),
-    getGraduatedPrices: vi.fn(() => []),
-    getId: vi.fn(() => 'sku-1'),
-    getItemId: vi.fn(() => '1'),
-    getLengthMM: vi.fn(() => 10),
-    getName: vi.fn(() => 'Test product'),
-    getPrice: vi.fn(() => 19.99),
-    getRegularPriceCurrency: vi.fn(() => 'EUR'),
-    getSpecialOffer: vi.fn(() => null),
+    getCoverImage: vi.fn(() => 'https://cdn03.plentyone.com/evlxcyoplb75/item/images/49565/full/49565.jpg'),
+    getId: vi.fn(() => '52884'),
+    getItemId: vi.fn(() => '49565'),
+    getManufacturer: vi.fn(() => ({ name: 'ABB' })),
+    getMetaDescription: vi.fn(() => 'ABB ACS301-08P7-3DE frequency converter'),
+    getName: vi.fn(() => 'ABB ACS301-08P7-3DE Frequenzumrichter Umrichter'),
     getSpecialPriceCurrency: vi.fn(() => 'EUR'),
     getTotalReviews: vi.fn(() => 0),
-    getWeightG: vi.fn(() => 500),
-    getWidthMM: vi.fn(() => 20),
-    getHeightMM: vi.fn(() => 30),
+    getUrlPath: vi.fn(() => 'abb-acs30108p73de-frequenzumrichter-umrichter-acs301-08p7-3de'),
   },
   productSeoSettingsGetters: {
-    getConditionOfItem: vi.fn(() => 'https://schema.org/NewCondition'),
+    getConditionOfItem: vi.fn(() => 'https://schema.org/UsedCondition'),
     getMappedAvailability: vi.fn(() => 'https://schema.org/InStock'),
-    getSeoManufacturer: vi.fn(() => ''),
-    getBrand: vi.fn(() => ''),
-    getSku: vi.fn(() => ''),
+    getSeoManufacturer: vi.fn(() => 'ABB'),
+    getBrand: vi.fn(() => 'ABB'),
+    getSku: vi.fn(() => '49565'),
     getGtin: vi.fn(() => ''),
     getGtin8: vi.fn(() => ''),
     getGtin13: vi.fn(() => ''),
     getIsbn: vi.fn(() => ''),
-    getMpn: vi.fn(() => ''),
+    getMpn: vi.fn(() => 'ACS301-08P7-3DE'),
     getPriceValidUntil: vi.fn(() => ''),
     getForcedCanonicalUrl: vi.fn(() => ''),
     getCanonical: vi.fn(() => ({})),
@@ -78,16 +87,22 @@ mockNuxtImport('useProductReviews', () => useProductReviews);
 mockNuxtImport('useProductReviewAverage', () => useProductReviewAverage);
 mockNuxtImport('useRoute', () => useRoute);
 mockNuxtImport('useLocalePath', () => useLocalePath);
+mockNuxtImport('useProductPrice', () => useProductPrice);
+mockNuxtImport('useModernImage', () => useModernImage);
 
 import { useStructuredData } from '../useStructuredData';
 
-const getStructuredData = () => {
-  const headConfig = useHead.mock.calls.at(-1)?.[0];
-  const scriptEntry = (headConfig?.script as Array<{ innerHTML: string }> | undefined)?.[0];
+const getStructuredDataByKey = (key: string) => {
+  const matchingCall = [...useHead.mock.calls].reverse().find((call) => {
+    const scripts = call[0]?.script as Array<{ key?: string; innerHTML: string }> | undefined;
+    return scripts?.some((script) => script.key === key);
+  });
 
-  expect(headConfig).toBeDefined();
+  const scriptEntry = (matchingCall?.[0]?.script as Array<{ key?: string; innerHTML: string }> | undefined)?.find(
+    (script) => script.key === key,
+  );
+
   expect(scriptEntry).toBeDefined();
-
   return JSON.parse(scriptEntry!.innerHTML);
 };
 
@@ -96,34 +111,110 @@ describe('useStructuredData', () => {
     vi.clearAllMocks();
     useProductReviews.mockReturnValue({ data: ref([{ id: 'review-1' }]) });
     useProductReviewAverage.mockReturnValue({ data: ref(undefined) });
+    useProductPrice.mockReturnValue({
+      price: ref(589),
+      crossedPrice: ref(null),
+    });
     vi.mocked(productGetters.getTotalReviews).mockReturnValue(0);
     vi.mocked(productSeoSettingsGetters.getForcedCanonicalUrl).mockReturnValue('');
     vi.mocked(productSeoSettingsGetters.getCanonical).mockReturnValue({} as never);
     vi.mocked(productSeoSettingsGetters.getCanonicalHref).mockReturnValue('');
     vi.mocked(productSeoSettingsGetters.getCanonicalAlternate).mockReturnValue([]);
+    vi.mocked(productSeoSettingsGetters.getMappedAvailability).mockReturnValue('https://schema.org/InStock');
+    vi.mocked(productSeoSettingsGetters.getConditionOfItem).mockReturnValue('https://schema.org/UsedCondition');
   });
 
-  it('omits aggregateRating when there are no reviews and sets a return policy', () => {
+  it('emits the full Organization schema with legalName', () => {
+    const { setLogoMeta } = useStructuredData();
+    setLogoMeta();
+
+    expect(getStructuredDataByKey('ld-organization')).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Komplett Konzept',
+      legalName: 'Komplett Konzept GmbH',
+      url: 'https://www.komplett-konzept.de/',
+      logo: 'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Dunkerstraße 29',
+        postalCode: '46325',
+        addressLocality: 'Borken-Burlo',
+        addressCountry: 'DE',
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: '+49-2862-587950',
+        contactType: 'customer service',
+        availableLanguage: ['German', 'English'],
+      },
+      sameAs: [
+        'https://www.facebook.com/Komplett.Konzept.GmbH/',
+        'https://www.instagram.com/komplettkonzept/',
+        'https://www.youtube.com/@konzeptkomplett4034',
+      ],
+    });
+  });
+
+  it('emits Product schema with Offer, return policy and shipping details when price is available', () => {
     const { setProductMetaData } = useStructuredData();
 
-    setProductMetaData(
-      {
-        texts: { description: 'Test description' },
-      } as never,
-      {} as never,
-    );
+    setProductMetaData({
+      texts: { description: 'Test description' },
+    } as never);
 
-    const structuredData = getStructuredData();
+    const structuredData = getStructuredDataByKey('ld-product');
 
+    expect(structuredData['@type']).toBe('Product');
+    expect(structuredData['@id']).toContain('#product');
+    expect(structuredData.sku).toBe('49565');
+    expect(structuredData.mpn).toBe('ACS301-08P7-3DE');
+    expect(structuredData.brand).toEqual({ '@type': 'Brand', name: 'ABB' });
+    expect(structuredData.manufacturer).toEqual({ '@type': 'Organization', name: 'ABB' });
+    expect(structuredData.itemCondition).toBe('https://schema.org/UsedCondition');
     expect(structuredData.aggregateRating).toBeUndefined();
-    expect(structuredData.offers.hasMerchantReturnPolicy).toEqual({
-      '@type': 'MerchantReturnPolicy',
-      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-      merchantReturnDays: 30,
-      refundType: 'https://schema.org/FullRefund',
-      returnMethod: 'https://schema.org/ReturnByMail',
-      returnFees: 'https://schema.org/FreeReturn',
+    expect(structuredData.offers).toEqual({
+      '@type': 'Offer',
+      url: 'https://www.komplett-konzept.de/abb-acs30108p73de-frequenzumrichter-umrichter-acs301-08p7-3de_49565_52884',
+      priceCurrency: 'EUR',
+      price: '589.00',
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/UsedCondition',
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        '@id': 'https://www.komplett-konzept.de/#merchant-return-policy',
+        applicableCountry: 'DE',
+        merchantReturnDays: 14,
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/ReturnShippingFees',
+        inStoreReturnsOffered: false,
+        url: 'https://www.komplett-konzept.de/widerruf',
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        '@id': 'https://www.komplett-konzept.de/#shipping-details',
+        name: 'Shipping Information',
+        url: 'https://www.komplett-konzept.de/shipping',
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'DE',
+        },
+      },
     });
+  });
+
+  it('omits Offer when price is unavailable', () => {
+    useProductPrice.mockReturnValue({
+      price: ref(0),
+      crossedPrice: ref(null),
+    });
+
+    const { setProductMetaData } = useStructuredData();
+    setProductMetaData({ texts: { description: 'Test description' } } as never);
+
+    const structuredData = getStructuredDataByKey('ld-product');
+    expect(structuredData.offers).toBeUndefined();
   });
 
   it('includes aggregateRating when reviewCount is positive', () => {
@@ -131,16 +222,9 @@ describe('useStructuredData', () => {
     useProductReviewAverage.mockReturnValue({ data: ref({}) });
 
     const { setProductMetaData } = useStructuredData();
+    setProductMetaData({ texts: { description: 'Test description' } } as never);
 
-    setProductMetaData(
-      {
-        texts: { description: 'Test description' },
-      } as never,
-      {} as never,
-    );
-
-    const structuredData = getStructuredData();
-
+    const structuredData = getStructuredDataByKey('ld-product');
     expect(structuredData.aggregateRating).toEqual({
       '@type': 'AggregateRating',
       ratingValue: 4.5,
@@ -157,7 +241,27 @@ describe('useStructuredData', () => {
       link: [
         {
           rel: 'canonical',
-          href: 'https://example.com/kategorie/neu-eingetroffen/test-product_58645_61987',
+          href: 'https://www.komplett-konzept.de/abb-acs30108p73de-frequenzumrichter-umrichter-acs301-08p7-3de_49565_52884',
+        },
+      ],
+    });
+  });
+
+  it('normalizes trailing slash on domain for the canonical fallback', () => {
+    useRuntimeConfig.mockReturnValue({
+      public: {
+        domain: 'https://www.komplett-konzept.de/',
+      },
+    });
+
+    const { setProductCanonicalMetaData } = useStructuredData();
+    setProductCanonicalMetaData({} as never);
+
+    expect(useHead).toHaveBeenCalledWith({
+      link: [
+        {
+          rel: 'canonical',
+          href: 'https://www.komplett-konzept.de/abb-acs30108p73de-frequenzumrichter-umrichter-acs301-08p7-3de_49565_52884',
         },
       ],
     });

@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { SfIconChevronRight } from '@storefront-ui/vue';
 import type { Product } from '@plentymarkets/shop-api';
-import { productGetters, reviewGetters, categoryTreeGetters } from '@plentymarkets/shop-api';
+import { productGetters, reviewGetters } from '@plentymarkets/shop-api';
 
 const route = useRoute();
 const { setCurrentProduct } = useProducts();
@@ -63,7 +63,6 @@ const { productForEditor, fetchProduct, setProductMeta, setBreadcrumbs, breadcru
 const product = productForEditor;
 const { disableActions } = useEditor();
 const { data: productReviews, fetchProductReviews } = useProductReviews(Number(productId));
-const { data: categoryTree } = useCategoryTree();
 const { open, openDrawer } = useProductLegalDetailsDrawer();
 const { setPageMeta } = usePageMeta();
 const { resetNotification } = useEditModeNotification(disableActions);
@@ -160,20 +159,14 @@ watch(
   },
 );
 
+// Product schema must always render on product pages (do not gate on category-tree match).
 watch(
-  () => categoryTree.value,
-  (categoriesTree) => {
-    setProductCanonicalMetaData(product.value);
-    const productCategoryId = productGetters.getParentCategoryId(product.value);
-    if (categoriesTree.length > 0 && productCategoryId) {
-      const categoryTree = categoriesTree.find(
-        (categoryTree) => categoryTreeGetters.getId(categoryTree) === productCategoryId,
-      );
-      if (categoryTree) {
-        setProductMetaData(product.value, categoryTree);
-        setProductRobotsMetaData(product.value);
-      }
-    }
+  () => product.value,
+  (currentProduct) => {
+    if (!currentProduct || Object.keys(currentProduct).length === 0) return;
+    setProductCanonicalMetaData(currentProduct);
+    setProductRobotsMetaData(currentProduct);
+    setProductMetaData(currentProduct);
   },
   { immediate: true },
 );
