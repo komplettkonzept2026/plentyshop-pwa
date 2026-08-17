@@ -72,7 +72,8 @@
     v-if="isAuthenticationOpen"
     v-model="isAuthenticationOpen"
     tag="section"
-    class="h-full md:w-[500px] md:h-fit m-0 p-0 overflow-y-auto"
+    class="h-fit w-full max-w-[500px] m-0 p-0 overflow-y-auto"
+    overlay-classes="!z-[1000] flex items-center justify-center p-4"
     aria-labelledby="login-modal"
   >
     <header>

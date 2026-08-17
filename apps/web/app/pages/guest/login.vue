@@ -64,7 +64,8 @@
         v-if="isAuthenticationOpen"
         v-model="isAuthenticationOpen"
         tag="section"
-        class="h-full w-full overflow-auto md:w-[500px] md:h-fit"
+        class="h-fit w-full max-w-[500px] overflow-auto"
+        overlay-classes="!z-[1000] flex items-center justify-center p-4"
       >
         <header>
           <UiButton
