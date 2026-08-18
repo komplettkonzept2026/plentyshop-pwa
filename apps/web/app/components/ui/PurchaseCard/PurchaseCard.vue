@@ -275,7 +275,7 @@
               </div>
 
               <div class="mt-6 mb-4 flex justify-center w-full min-w-0">
-                <OptimizedStaticImage
+                <UiOptimizedStaticImage
                   base-src="/_nuxt-plenty/images/wider_version_opt"
                   fallback-ext="jpg"
                   alt="Komplett Konzept"

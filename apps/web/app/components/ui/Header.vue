@@ -19,7 +19,7 @@
           aria-label="Finanzieren und Leasen"
           class="self-stretch active:scale-95 transition-transform duration-200 flex-shrink-0"
         >
-          <OptimizedStaticImage
+          <UiOptimizedStaticImage
             base-src="/_nuxt-plenty/images/image009-2"
             alt="Jetzt günstig finanzieren und leasen"
             img-class="self-stretch h-full -mt-2 lg:-mt-2 min-[1367px]:mt-0 max-w-[68px] lg:max-w-[80px] min-[1152px]:max-w-[100px] min-[1280px]:max-w-[120px] min-[1367px]:max-w-[160px] w-auto object-contain rounded-md shadow-sm transition-all duration-300"
@@ -39,7 +39,7 @@
           rel="noopener noreferrer"
           class="active:scale-95 transition-transform duration-200 flex-shrink-0"
         >
-          <OptimizedStaticImage
+          <UiOptimizedStaticImage
             base-src="/_nuxt-plenty/images/ankaufsformular-logo"
             alt="Ankaufsformular"
             img-class="h-[40px] lg:h-[50px] min-[1152px]:h-[58px] min-[1280px]:h-[84px] min-[1367px]:h-[110px] max-w-[62px] lg:max-w-[78px] min-[1152px]:max-w-[90px] min-[1280px]:max-w-[128px] min-[1367px]:max-w-[172px] w-auto object-contain transition-all duration-300"
@@ -217,7 +217,7 @@
             aria-label="Finanzieren und Leasen"
             class="active:scale-95 transition-transform duration-200 flex-shrink-0"
           >
-            <OptimizedStaticImage
+            <UiOptimizedStaticImage
               base-src="/_nuxt-plenty/images/image009-2"
               alt="Jetzt günstig finanzieren und leasen"
               img-class="h-10 sm:h-12 w-auto object-contain rounded shadow-sm"
@@ -232,7 +232,7 @@
             rel="noopener noreferrer"
             class="active:scale-95 transition-transform duration-200 flex-shrink-0"
           >
-            <OptimizedStaticImage
+            <UiOptimizedStaticImage
               base-src="/_nuxt-plenty/images/ankaufsformular-logo"
               alt="Ankaufsformular"
               img-class="h-11 sm:h-14 w-auto object-contain drop-shadow-sm"
