@@ -148,6 +148,42 @@ describe('useModernImage with webp and avif enabled', () => {
     const res = addModernImageExtension(url);
     expect(res).toBe('https://example.com/item/images/image.jpg.avif');
   });
+
+  it('should expose AVIF + WebP picture sources when AVIF is enabled', () => {
+    const { setInitialData } = useSiteSettings();
+    setInitialData([
+      { key: 'useAvif', originalKey: 'useAvif', value: 'true' },
+      { key: 'useWebp', originalKey: 'useWebp', value: 'false' },
+    ]);
+
+    const { getModernImageSources } = useModernImage();
+    expect(getModernImageSources('https://example.com/item/images/image.jpg')).toEqual({
+      original: 'https://example.com/item/images/image.jpg',
+      avif: 'https://example.com/item/images/image.jpg.avif',
+      webp: 'https://example.com/item/images/image.jpg.webp',
+    });
+  });
+
+  it('should strip double extensions before rebuilding gallery originals', () => {
+    const { setInitialData } = useSiteSettings();
+    setInitialData([
+      { key: 'useAvif', originalKey: 'useAvif', value: 'true' },
+      { key: 'useWebp', originalKey: 'useWebp', value: 'true' },
+    ]);
+
+    const { addModernImageExtensionForGallery } = useModernImage();
+    const images = addModernImageExtensionForGallery([
+      {
+        url: 'https://example.com/item/images/image.jpg.avif',
+        urlPreview: 'https://example.com/item/images/preview.jpg.avif',
+        urlMiddle: 'https://example.com/item/images/middle.jpg.avif',
+        urlSecondPreview: 'https://example.com/item/images/second.jpg.avif',
+      } as never,
+    ]);
+
+    expect(images[0]?.url).toBe('https://example.com/item/images/image.jpg');
+    expect(images[0]?.urlPreview).toBe('https://example.com/item/images/preview.jpg');
+  });
 });
 
 describe('useModernImage with webp and avif disabled', () => {

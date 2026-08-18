@@ -409,8 +409,6 @@
       "currentPage": "Current Page is {page}",
       "goToPage": "Navigate to Page {page}",
       "languageSelector": "Open language select",
-      "loadTranslate": "Load Google Translate",
-      "translatePlaceholder": "Select language",
       "nextAriaLabel": "Navigate to next page",
       "openConfigurationDrawer": "Open configuration drawer",
       "openSearchModal": "Open item search",

@@ -11,37 +11,35 @@
     </div>
 
     <template v-if="!isMobile && imagesLoaded[`gallery-img-${index}`]">
-      <NuxtImg
-        v-if="disableZoom"
-        v-bind="nuxtImgProps"
+      <template v-if="disableZoom">
+        <picture>
+          <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
+          <source v-if="webpSrcset" type="image/webp" :srcset="webpSrcset" :sizes="sizesAttr" />
+          <img v-bind="imgProps" :data-testid="`product-image-${index}`" @load="onImageLoad" />
+        </picture>
+      </template>
+
+      <Drift v-else :key="route.fullPath" :index="index">
+        <picture>
+          <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
+          <source v-if="webpSrcset" type="image/webp" :srcset="webpSrcset" :sizes="sizesAttr" />
+          <img v-bind="imgProps" :data-testid="`product-image-${index}`" @load="onImageLoad" />
+        </picture>
+      </Drift>
+    </template>
+
+    <picture v-else>
+      <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
+      <source v-if="webpSrcset" type="image/webp" :srcset="webpSrcset" :sizes="sizesAttr" />
+      <img
+        v-bind="imgProps"
         :data-testid="`product-image-${index}`"
         @touchstart="onTouchStart"
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
-        @load="updateImageStatusFor(`gallery-img-${index}`)"
+        @load="onImageLoad"
       />
-
-      <Drift v-else :key="route.fullPath" :index="index">
-        <NuxtImg
-          v-bind="nuxtImgProps"
-          :data-testid="`product-image-${index}`"
-          @touchstart="onTouchStart"
-          @touchmove="onTouchMove"
-          @touchend="onTouchEnd"
-          @load="updateImageStatusFor(`gallery-img-${index}`)"
-        />
-      </Drift>
-    </template>
-
-    <NuxtImg
-      v-else
-      v-bind="nuxtImgProps"
-      :data-testid="`product-image-${index}`"
-      @touchstart="onTouchStart"
-      @touchmove="onTouchMove"
-      @touchend="onTouchEnd"
-      @load="updateImageStatusFor(`gallery-img-${index}`)"
-    />
+    </picture>
 
     <SfLoaderCircular v-if="!imagesLoaded[`gallery-img-${index}`]" class="absolute" size="sm" />
   </div>
@@ -50,7 +48,6 @@
 <script setup lang="ts">
 import { productImageGetters } from '@plentymarkets/shop-api';
 import { SfLoaderCircular } from '@storefront-ui/vue';
-import type { ImagesData } from '@plentymarkets/shop-api';
 import type { ZoomableImageProps } from '~/components/ZoomableImage/types';
 
 const props = defineProps<ZoomableImageProps>();
@@ -61,6 +58,8 @@ const imagesLoaded = ref([] as unknown as { [key: string]: boolean });
 const { isZoomed, imageStyle, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(containerReference);
 const viewport = useViewport();
 const route = useRoute();
+const { t } = useI18n();
+const { getModernImageSources } = useModernImage();
 
 const image = props.image;
 const index = props.index;
@@ -69,17 +68,22 @@ const isFirstImage = props.isFirstImage;
 const isMobile = computed(() => viewport.isLessThan('lg'));
 
 const showZoomHint = ref(false);
+const sizesAttr = '(max-width: 320px) 370px, (max-width: 640px) 720px, (max-width: 768px) 740px, 1400px';
 
-const imageUrl = productImageGetters.getImageUrl(image);
 const imageAlt = productImageGetters.getImageAlternate(image) || productImageGetters.getCleanImageName(image) || '';
 const imageTitle = productImageGetters.getImageName(image) || productImageGetters.getCleanImageName(image) || '';
 
-const getSourceSet = (image: ImagesData) => {
+const mapUrl = (url: string, pick: 'original' | 'avif' | 'webp') => {
+  const sources = getModernImageSources(url);
+  return sources[pick] || sources.original;
+};
+
+const buildSrcset = (pick: 'original' | 'avif' | 'webp') => {
   const dpr = 1;
-  const secondPreview = productImageGetters.getImageUrlSecondPreview(image);
-  const preview = productImageGetters.getImageUrlPreview(image);
-  const middle = productImageGetters.getImageUrlMiddle(image);
-  const full = productImageGetters.getImageUrl(image);
+  const secondPreview = mapUrl(productImageGetters.getImageUrlSecondPreview(image), pick);
+  const preview = mapUrl(productImageGetters.getImageUrlPreview(image), pick);
+  const middle = mapUrl(productImageGetters.getImageUrlMiddle(image), pick);
+  const full = mapUrl(productImageGetters.getImageUrl(image), pick);
 
   return `
     ${secondPreview} ${370 * dpr}w,
@@ -89,29 +93,38 @@ const getSourceSet = (image: ImagesData) => {
   `;
 };
 
+const fullSources = computed(() => getModernImageSources(productImageGetters.getImageUrl(image)));
+const imageUrl = computed(() => fullSources.value.original || productImageGetters.getImageUrl(image));
+const preferredZoomUrl = computed(
+  () => fullSources.value.avif || fullSources.value.webp || fullSources.value.original,
+);
+
+const avifSrcset = computed(() => (fullSources.value.avif ? buildSrcset('avif') : ''));
+const webpSrcset = computed(() => (fullSources.value.webp ? buildSrcset('webp') : ''));
+const originalSrcset = computed(() => buildSrcset('original'));
+
 const computedWidth = computed(() => {
   const imageWidth = productImageGetters.getImageWidth(image) || 600;
-  return imageUrl.includes(defaults.IMAGE_LINK_SUFIX) ? imageWidth : '';
+  return imageUrl.value.includes(defaults.IMAGE_LINK_SUFIX) ? imageWidth : '';
 });
 
 const computedHeight = computed(() => {
   const imageHeight = productImageGetters.getImageHeight(image) || 600;
-  return imageUrl.includes(defaults.IMAGE_LINK_SUFIX) ? imageHeight : '';
+  return imageUrl.value.includes(defaults.IMAGE_LINK_SUFIX) ? imageHeight : '';
 });
 
-const nuxtImgProps = computed<Record<string, unknown>>(() => ({
+const imgProps = computed<Record<string, unknown>>(() => ({
   id: `gallery-img-${index}`,
   alt: imageAlt,
   title: imageTitle,
   'aria-hidden': activeIndex !== index,
-  fit: 'fill',
   class: isMobile.value
     ? { 'object-contain h-full w-full': true, zoomed: isZoomed.value }
     : { 'object-contain h-full w-full': true, [`demo-trigger-${index}`]: true },
-  'data-zoom': imageUrl,
-  quality: 80,
-  srcset: getSourceSet(image),
-  sizes: '2xs:370px xs:720px sm:740px md:1400px',
+  'data-zoom': preferredZoomUrl.value,
+  src: imageUrl.value,
+  srcset: originalSrcset.value,
+  sizes: sizesAttr,
   draggable: 'false',
   loading: isFirstImage ? 'eager' : 'lazy',
   fetchpriority: isFirstImage ? 'high' : 'auto',
@@ -120,14 +133,18 @@ const nuxtImgProps = computed<Record<string, unknown>>(() => ({
   style: isMobile.value ? imageStyle.value : '',
 }));
 
+const onImageLoad = () => {
+  updateImageStatusFor(`gallery-img-${index}`);
+};
+
 const updateImageStatusFor = (imageId: string) => {
   if (!imagesLoaded.value[imageId]) imagesLoaded.value[imageId] = true;
 };
 
 onMounted(() => {
   nextTick(() => {
-    for (const [index] of props.images.entries()) {
-      const myImg: HTMLImageElement | null = document.querySelector(`#gallery-img-${index}`);
+    for (const [imgIndex] of props.images.entries()) {
+      const myImg: HTMLImageElement | null = document.querySelector(`#gallery-img-${imgIndex}`);
       const imgId = String(myImg?.id);
       if (!imagesLoaded.value[imgId]) imagesLoaded.value[imgId] = Boolean(myImg?.complete);
     }

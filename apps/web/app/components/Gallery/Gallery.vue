@@ -62,7 +62,7 @@
                 class="rounded h-full w-full object-contain"
                 :width="productImageGetters.getImageWidth(image) ?? 80"
                 :height="productImageGetters.getImageHeight(image) ?? 80"
-                :src="productImageGetters.getImageUrlPreview(image)"
+                :src="addModernImageExtension(productImageGetters.getImageUrlPreview(image))"
                 :quality="80"
                 loading="lazy"
               />
@@ -130,6 +130,7 @@ const props = withDefaults(defineProps<GalleryProps>(), {
 
 const { $isPreview } = useNuxtApp();
 const { disableActions } = useEditor();
+const { addModernImageExtension } = useModernImage();
 
 const configuration = computed(() => props.configuration);
 const { images } = toRefs(props);

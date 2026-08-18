@@ -47,8 +47,6 @@
           <nav
             class="flex flex-row flex-nowrap items-center gap-0.5"
           >
-            <div class="mr-3"><GoogleTranslate /></div>
-
             <template v-if="localeCodes.length > 1">
               <UiButton
                 v-if="!isLanguageSelectOpen"
@@ -234,10 +232,6 @@
         </div>
 
         <div class="flex flex-col items-end gap-0.5 flex-shrink-0">
-          <div class="scale-[0.85] transform origin-right">
-            <GoogleTranslate />
-          </div>
-
           <a
             href="tel:+492862587950"
             class="text-[12px] sm:text-[14px] font-black transition-colors whitespace-nowrap hover:text-blue-600 pr-1"
@@ -299,7 +293,6 @@ import {
 import LanguageSelector from '~/components/LanguageSelector/LanguageSelector.vue';
 import { paths } from '~/utils/paths';
 import { handleLogout } from '~/utils/logout';
-import GoogleTranslate from '~/components/GoogleTranslate.vue';
 
 // Public asset path (dynamic :src avoids Vite treating /_nuxt-plenty/* as a module import).
 const ankaufsformularLogoSrc = '/_nuxt-plenty/images/ankaufsformular-logo.png';
