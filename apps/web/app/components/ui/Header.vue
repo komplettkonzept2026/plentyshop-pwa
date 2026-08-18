@@ -19,10 +19,13 @@
           aria-label="Finanzieren und Leasen"
           class="self-stretch active:scale-95 transition-transform duration-200 flex-shrink-0"
         >
-          <img
-            src="/_nuxt-plenty/images/image009-2.png"
+          <OptimizedStaticImage
+            base-src="/_nuxt-plenty/images/image009-2"
             alt="Jetzt günstig finanzieren und leasen"
-            class="self-stretch h-full -mt-2 lg:-mt-2 min-[1367px]:mt-0 max-w-[68px] lg:max-w-[80px] min-[1152px]:max-w-[100px] min-[1280px]:max-w-[120px] min-[1367px]:max-w-[160px] w-auto object-contain rounded-md shadow-sm transition-all duration-300"
+            img-class="self-stretch h-full -mt-2 lg:-mt-2 min-[1367px]:mt-0 max-w-[68px] lg:max-w-[80px] min-[1152px]:max-w-[100px] min-[1280px]:max-w-[120px] min-[1367px]:max-w-[160px] w-auto object-contain rounded-md shadow-sm transition-all duration-300"
+            :width="160"
+            :height="136"
+            loading="eager"
           />
         </NuxtLink>
       </div>
@@ -36,10 +39,13 @@
           rel="noopener noreferrer"
           class="active:scale-95 transition-transform duration-200 flex-shrink-0"
         >
-          <img
-            :src="ankaufsformularLogoSrc"
+          <OptimizedStaticImage
+            base-src="/_nuxt-plenty/images/ankaufsformular-logo"
             alt="Ankaufsformular"
-            class="h-[40px] lg:h-[50px] min-[1152px]:h-[58px] min-[1280px]:h-[84px] min-[1367px]:h-[110px] max-w-[62px] lg:max-w-[78px] min-[1152px]:max-w-[90px] min-[1280px]:max-w-[128px] min-[1367px]:max-w-[172px] w-auto object-contain transition-all duration-300"
+            img-class="h-[40px] lg:h-[50px] min-[1152px]:h-[58px] min-[1280px]:h-[84px] min-[1367px]:h-[110px] max-w-[62px] lg:max-w-[78px] min-[1152px]:max-w-[90px] min-[1280px]:max-w-[128px] min-[1367px]:max-w-[172px] w-auto object-contain transition-all duration-300"
+            :width="172"
+            :height="110"
+            loading="eager"
           />
         </NuxtLink>
 
@@ -211,10 +217,13 @@
             aria-label="Finanzieren und Leasen"
             class="active:scale-95 transition-transform duration-200 flex-shrink-0"
           >
-            <img
-              src="/_nuxt-plenty/images/image009-2.png"
+            <OptimizedStaticImage
+              base-src="/_nuxt-plenty/images/image009-2"
               alt="Jetzt günstig finanzieren und leasen"
-              class="h-10 sm:h-12 w-auto object-contain rounded shadow-sm"
+              img-class="h-10 sm:h-12 w-auto object-contain rounded shadow-sm"
+              :width="160"
+              :height="136"
+              loading="eager"
             />
           </NuxtLink>
           <NuxtLink
@@ -223,10 +232,13 @@
             rel="noopener noreferrer"
             class="active:scale-95 transition-transform duration-200 flex-shrink-0"
           >
-            <img
-              src="/_nuxt-plenty/images/ankaufsformular-logo.png"
+            <OptimizedStaticImage
+              base-src="/_nuxt-plenty/images/ankaufsformular-logo"
               alt="Ankaufsformular"
-              class="h-11 sm:h-14 w-auto object-contain drop-shadow-sm"
+              img-class="h-11 sm:h-14 w-auto object-contain drop-shadow-sm"
+              :width="172"
+              :height="110"
+              loading="eager"
             />
           </NuxtLink>
         </div>
@@ -293,9 +305,6 @@ import {
 import LanguageSelector from '~/components/LanguageSelector/LanguageSelector.vue';
 import { paths } from '~/utils/paths';
 import { handleLogout } from '~/utils/logout';
-
-// Public asset path (dynamic :src avoids Vite treating /_nuxt-plenty/* as a module import).
-const ankaufsformularLogoSrc = '/_nuxt-plenty/images/ankaufsformular-logo.png';
 
 const isLogin = ref(true);
 const { data: cart } = useCart();

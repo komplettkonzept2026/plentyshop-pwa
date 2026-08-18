@@ -504,7 +504,14 @@
     },
     "marketing": {
       "description": "Marketing cookies are used by third parties and publishers to display personalised advertisements by following users across websites.",
-      "label": "Marketing"
+      "label": "Marketing",
+      "cookies": {
+        "gtm": {
+          "name": "Google Tag Manager",
+          "provider": "Google Ireland Limited",
+          "status": "Loads analytics and marketing tags only after consent."
+        }
+      }
     },
     "More information": "More information",
     "Privacy Settings": "Privacy Settings",
@@ -1028,6 +1035,9 @@
     "leasingo": {
       "loadCalculator": "Load leasing calculator",
       "loading": "Loading leasing calculator…"
+    },
+    "paypal": {
+      "loadOptions": "Load PayPal options"
     },
     "graduatedPrices": {
       "discount": "DISCOUNT",

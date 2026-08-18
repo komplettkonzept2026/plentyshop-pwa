@@ -6,7 +6,21 @@
         :src="headerLogo"
         :alt="`${storeName} logo`"
         class="h-[50px] lg:h-[62px] min-[1152px]:h-[72px] min-[1280px]:h-[96px] min-[1367px]:h-[126px] w-auto object-contain scale-[1.1] origin-left transition-all duration-300"
-        preload
+      />
+    </template>
+    <template v-else-if="useLocalOptimizedLogo">
+      <source type="image/avif" srcset="/_nuxt-plenty/images/logo-header.avif" />
+      <source type="image/webp" srcset="/_nuxt-plenty/images/logo-header.webp" />
+      <img
+        id="logo"
+        ref="logo"
+        src="/_nuxt-plenty/images/logo-header.jpg"
+        :alt="`${storeName} logo`"
+        class="h-[50px] lg:h-[62px] min-[1152px]:h-[72px] min-[1280px]:h-[96px] min-[1367px]:h-[126px] w-auto object-contain scale-[1.1] origin-left transition-all duration-300"
+        width="800"
+        height="391"
+        decoding="async"
+        fetchpriority="low"
       />
     </template>
     <template v-else>
@@ -16,7 +30,8 @@
         :src="headerLogo"
         :alt="`${storeName} logo`"
         class="h-[50px] lg:h-[62px] min-[1152px]:h-[72px] min-[1280px]:h-[96px] min-[1367px]:h-[126px] w-auto object-contain scale-[1.1] origin-left transition-all duration-300"
-        preload
+        decoding="async"
+        fetchpriority="low"
       />
     </template>
   </picture>
@@ -27,6 +42,7 @@ const runtimeConfig = useRuntimeConfig();
 const { getSetting: getHeaderLogo } = useSiteSettings('headerLogo');
 
 const headerLogo = computed(() => getHeaderLogo());
+const useLocalOptimizedLogo = computed(() => /Logo_ohne_GmbH\.jpe?g/i.test(headerLogo.value || ''));
 
 const storeName = runtimeConfig.public.storename;
 

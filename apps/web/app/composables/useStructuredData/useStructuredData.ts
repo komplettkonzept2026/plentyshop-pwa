@@ -293,6 +293,8 @@ export const useStructuredData: useStructuredDataReturn = () => {
         shippingDetails: {
           '@type': 'OfferShippingDetails',
           '@id': `${domain}/#shipping-details`,
+          name: 'Shipping Information',
+          url: `${domain}/shipping`,
           shippingRate: {
             '@type': 'MonetaryAmount',
             value: '0.00',

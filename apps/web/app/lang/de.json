@@ -504,7 +504,14 @@
     },
     "marketing": {
       "description": "Marketing-Cookies werden von Drittanbietern und Publishern verwendet, um personalisierte Werbung anzuzeigen. Sie tun dies, indem Sie Besucher über Websites hinweg verfolgen.",
-      "label": "Marketing"
+      "label": "Marketing",
+      "cookies": {
+        "gtm": {
+          "name": "Google Tag Manager",
+          "provider": "Google Ireland Limited",
+          "status": "Lädt Analyse- und Marketing-Tags erst nach Einwilligung."
+        }
+      }
     },
     "More information": "Mehr Informationen",
     "Privacy Settings": "Datenschutzeinstellungen",
@@ -1028,6 +1035,9 @@
     "leasingo": {
       "loadCalculator": "Leasingrechner laden",
       "loading": "Leasingrechner wird geladen…"
+    },
+    "paypal": {
+      "loadOptions": "PayPal-Optionen laden"
     },
     "graduatedPrices": {
       "discount": "RABATT",
