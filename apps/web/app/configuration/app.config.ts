@@ -31,15 +31,8 @@ export const appConfiguration = {
       { property: 'og:title', content: openGraph.title },
       { property: 'og:url', content: process.env.API_ENDPOINT },
     ],
-    script: [
-      {
-        src: 'https://komplett-konzept.leasingo.cloud/integration/rateIndicator',
-        async: true,
-      },
-      {
-        src: 'https://komplett-konzept.leasingo.cloud/integration/calculator',
-        async: true,
-      },
-    ],
+    // Leasingo (rateIndicator + calculator) is intentionally omitted from the
+    // global head. Scripts load only after user interaction on the product page
+    // (see PurchaseCard) so they do not count against initial-page transfer.
   },
 };

@@ -285,17 +285,31 @@
                 </NuxtLink>
               </div>
 
-              <div
-                v-if="isWidgetReady"
-                :key="productGetters.getId(product)"
-                class="leasingo-calculator mt-4 min-w-0 max-w-full overflow-x-auto"
-                :data-object-price-netto="leasingNetPrice"
-                data-maturity="48"
-                data-finance-product="1"
-                data-object-condition="1"
-                :data-category="widgetMainCategory"
-                :data-subcategory="widgetSubCategory"
-              />
+              <!-- Leasingo: load third-party calculator only after explicit user action -->
+              <div v-if="isLeasingEligible" class="mt-4 min-w-0">
+                <button
+                  v-if="!isWidgetReady"
+                  type="button"
+                  class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded font-bold text-sm transition-colors hover:opacity-90"
+                  style="background: #152440; color: #ffffff;"
+                  data-testid="leasingo-load"
+                  :disabled="isLeasingoLoading"
+                  @click="requestLeasingo"
+                >
+                  {{ isLeasingoLoading ? t('product.leasingo.loading') : t('product.leasingo.loadCalculator') }}
+                </button>
+                <div
+                  v-else
+                  :key="productGetters.getId(product)"
+                  class="leasingo-calculator min-w-0 max-w-full overflow-x-auto"
+                  :data-object-price-netto="leasingNetPrice"
+                  data-maturity="48"
+                  data-finance-product="1"
+                  data-object-condition="1"
+                  :data-category="widgetMainCategory"
+                  :data-subcategory="widgetSubCategory"
+                />
+              </div>
             </template>
 
             <template v-if="key === 'itemText' && configuration?.fields.itemText">
@@ -423,7 +437,7 @@ const { openQuickCheckout } = useQuickCheckout();
 const { crossedPrice } = useProductPrice(props?.product);
 // const { reviewArea } = useProductReviews(Number(productGetters.getId(props?.product)));
 const localePath = useLocalePath();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 
 const inlineStyle = computed(() => {
   const layout = props?.configuration?.layout || ({} as PriceCardPadding);
@@ -609,10 +623,15 @@ interface LeasingoWindow extends Window {
   purchaseCardCalculator?: any;
 }
 
-// 1. Reactive Variables for the Widget
+const LEASINGO_CALCULATOR_SRC = 'https://komplett-konzept.leasingo.cloud/integration/calculator';
+const LEASINGO_MIN_NET_PRICE = 2500;
+
 const widgetMainCategory = ref('');
 const widgetSubCategory = ref('');
 const isWidgetReady = ref(false);
+const isLeasingoLoading = ref(false);
+/** User opted in — keep calculator across product/locale updates until they leave eligibility. */
+const hasRequestedLeasingo = ref(false);
 
 const leasingNetPrice = computed(() => {
   const apiNetPrice = netPriceWithProperties.value;
@@ -625,40 +644,69 @@ const leasingNetPrice = computed(() => {
   return (grossPrice / (1 + vatRate / 100)).toFixed(2);
 });
 
+const isLeasingEligible = computed(() => Number(leasingNetPrice.value) > LEASINGO_MIN_NET_PRICE);
+
+const unloadLeasingoScripts = () => {
+  if (typeof window === 'undefined') return;
+  document.querySelectorAll('script[src*="leasingo"]').forEach((el) => el.remove());
+  const win = window as LeasingoWindow;
+  delete win.purchaseCardCalculator;
+  delete win.lgoCalculatorCallbacks;
+};
+
+const mountLeasingoCalculator = async () => {
+  if (typeof window === 'undefined' || !isLeasingEligible.value) return;
+
+  isWidgetReady.value = false;
+  unloadLeasingoScripts();
+  isLeasingoLoading.value = true;
+
+  await nextTick();
+
+  installLeasingoLocaleInterceptor(locale.value);
+  const { category, subcategory } = getLeasingoCategoryDataAttrs(locale.value);
+  widgetMainCategory.value = category;
+  widgetSubCategory.value = subcategory;
+
+  isWidgetReady.value = true;
+
+  await nextTick();
+  const script = document.createElement('script');
+  script.src = LEASINGO_CALCULATOR_SRC;
+  script.async = true;
+  script.onload = () => {
+    isLeasingoLoading.value = false;
+  };
+  script.onerror = () => {
+    isLeasingoLoading.value = false;
+    isWidgetReady.value = false;
+  };
+  document.body.appendChild(script);
+};
+
+const requestLeasingo = () => {
+  hasRequestedLeasingo.value = true;
+  void mountLeasingoCalculator();
+};
+
 watch(
-  () => [productGetters.getId(props.product), leasingNetPrice.value, locale.value],
-  async () => {
-    // 1. RESET EVERYTHING
+  () => [productGetters.getId(props.product), leasingNetPrice.value, locale.value] as const,
+  () => {
     if (typeof window === 'undefined') return;
 
-    isWidgetReady.value = false; // Hides the div immediately
-    document.querySelectorAll('script[src*="leasingo"]').forEach((el) => el.remove());
-    const win = window as LeasingoWindow;
-    delete win.purchaseCardCalculator;
-    delete win.lgoCalculatorCallbacks;
+    isWidgetReady.value = false;
+    unloadLeasingoScripts();
 
-    if (Number(leasingNetPrice.value) <= 2500) return;
+    if (!isLeasingEligible.value) {
+      hasRequestedLeasingo.value = false;
+      isLeasingoLoading.value = false;
+      return;
+    }
 
-    await nextTick();
-
-    // Match leasinGo taxonomy names to the active shop locale (bundle is DE-only by default).
-    setTimeout(() => {
-      installLeasingoLocaleInterceptor(locale.value);
-      const { category, subcategory } = getLeasingoCategoryDataAttrs(locale.value);
-      widgetMainCategory.value = category;
-      widgetSubCategory.value = subcategory;
-
-      // 3. RENDER THE DIV (Now it has the correct attributes)
-      isWidgetReady.value = true;
-
-      // 4. LOAD THE SCRIPT (Only after the DIV is on screen)
-      nextTick(() => {
-        const script = document.createElement('script');
-        script.src = 'https://komplett-konzept.leasingo.cloud/integration/calculator';
-        script.async = true;
-        document.body.appendChild(script);
-      });
-    }, 100);
+    // Never auto-load on first paint — only remount after an explicit user request.
+    if (hasRequestedLeasingo.value) {
+      void mountLeasingoCalculator();
+    }
   },
   { immediate: true },
 );

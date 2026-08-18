@@ -409,6 +409,8 @@
       "currentPage": "Die aktuelle Seite ist {page}",
       "goToPage": "Zur Seite navigieren {page}",
       "languageSelector": "Sprachauswahl öffnen",
+      "loadTranslate": "Google Übersetzer laden",
+      "translatePlaceholder": "Sprache wählen",
       "nextAriaLabel": "Zur nächsten Seite navigieren",
       "openConfigurationDrawer": "Konfigurations-Drawer öffnen",
       "openSearchModal": "Suche öffnen",
@@ -1025,6 +1027,10 @@
     "priceInclVAT": "inkl. ges. MwSt",
     "reviewsCount": "{Anzahl} Bewertungen",
     "showAllReviews": "Alle Bewertungen anzeigen",
+    "leasingo": {
+      "loadCalculator": "Leasingrechner laden",
+      "loading": "Leasingrechner wird geladen…"
+    },
     "graduatedPrices": {
       "discount": "RABATT",
       "price": "PREIS",

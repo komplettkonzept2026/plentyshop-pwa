@@ -188,18 +188,36 @@ describe('useStructuredData', () => {
         merchantReturnDays: 14,
         returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
         returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/ReturnShippingFees',
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
         inStoreReturnsOffered: false,
         url: 'https://www.komplett-konzept.de/widerruf',
       },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
         '@id': 'https://www.komplett-konzept.de/#shipping-details',
-        name: 'Shipping Information',
-        url: 'https://www.komplett-konzept.de/shipping',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0.00',
+          currency: 'EUR',
+        },
         shippingDestination: {
           '@type': 'DefinedRegion',
           addressCountry: 'DE',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
         },
       },
     });

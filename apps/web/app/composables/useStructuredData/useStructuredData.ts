@@ -230,6 +230,7 @@ export const useStructuredData: useStructuredDataReturn = () => {
         price: priceValue.toFixed(2),
         availability,
         itemCondition: itemCondition || undefined,
+        // Return window confirmed against /widerruf + /cancellation-rights (14-day Widerruf).
         hasMerchantReturnPolicy: {
           '@type': 'MerchantReturnPolicy',
           '@id': `${domain}/#merchant-return-policy`,
@@ -237,18 +238,39 @@ export const useStructuredData: useStructuredDataReturn = () => {
           merchantReturnDays: 14,
           returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
           returnMethod: 'https://schema.org/ReturnByMail',
-          returnFees: 'https://schema.org/ReturnShippingFees',
+          returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
           inStoreReturnsOffered: false,
           url: `${domain}/widerruf`,
         },
+        // Google OfferShippingDetails requires shippingRate + shippingDestination + deliveryTime.
+        // /shipping currently has no CMS rates ("Keine Versandinformationen verfügbar"); values
+        // follow SCHEMA-FOR-DEV-TEAM.md German-market defaults (free DE ship, 0–1 handling, 1–3 transit).
         shippingDetails: {
           '@type': 'OfferShippingDetails',
           '@id': `${domain}/#shipping-details`,
-          name: 'Shipping Information',
-          url: `${domain}/shipping`,
+          shippingRate: {
+            '@type': 'MonetaryAmount',
+            value: '0.00',
+            currency: priceCurrency || 'EUR',
+          },
           shippingDestination: {
             '@type': 'DefinedRegion',
             addressCountry: 'DE',
+          },
+          deliveryTime: {
+            '@type': 'ShippingDeliveryTime',
+            handlingTime: {
+              '@type': 'QuantitativeValue',
+              minValue: 0,
+              maxValue: 1,
+              unitCode: 'DAY',
+            },
+            transitTime: {
+              '@type': 'QuantitativeValue',
+              minValue: 1,
+              maxValue: 3,
+              unitCode: 'DAY',
+            },
           },
         },
       };

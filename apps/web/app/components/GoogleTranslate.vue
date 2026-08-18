@@ -1,6 +1,18 @@
 <template>
   <div class="google-translate-wrapper">
-    <div id="google_translate_element" />
+    <button
+      v-if="!isActivated"
+      type="button"
+      class="translate-placeholder"
+      :aria-label="t('common.navigation.loadTranslate')"
+      data-testid="google-translate-load"
+      @click="activate"
+      @pointerdown="activate"
+      @focus="activate"
+    >
+      {{ t('common.navigation.translatePlaceholder') }}
+    </button>
+    <div v-show="isActivated" :id="elementId" />
   </div>
 </template>
 
@@ -18,17 +30,21 @@ type GoogleTranslateConstructor = new (
   elementId: string,
 ) => unknown;
 
-type GoogleTranslateWindow = Window & typeof globalThis & {
-  googleTranslateElementInit?: () => void;
-  google?: typeof globalThis.google & {
-    translate?: {
-      TranslateElement: GoogleTranslateConstructor;
+type GoogleTranslateWindow = Window &
+  typeof globalThis & {
+    googleTranslateElementInit?: () => void;
+    google?: typeof globalThis.google & {
+      translate?: {
+        TranslateElement: GoogleTranslateConstructor;
+      };
     };
   };
-};
 
 const route = useRoute();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
+const elementId = `google_translate_element_${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+const isActivated = ref(false);
+const isInitializing = ref(false);
 
 const GOOGLE_TRANSLATE_LOCALE_MAP: Record<string, string> = {
   cn: 'zh-CN',
@@ -82,7 +98,9 @@ const getGoogleTranslatePageLanguage = () => GOOGLE_TRANSLATE_LOCALE_MAP[locale.
  * Re-insert any missing included languages (notably German on the DE shop).
  */
 const ensureIncludedLanguagesInDropdown = () => {
-  const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
+  const root = document.getElementById(elementId);
+  const select = root?.querySelector<HTMLSelectElement>('.goog-te-combo')
+    ?? document.querySelector<HTMLSelectElement>('.goog-te-combo');
   if (!select) return;
 
   const existing = new Set(Array.from(select.options).map((option) => option.value));
@@ -99,31 +117,63 @@ const ensureIncludedLanguagesInDropdown = () => {
   });
 };
 
-const loadGoogleTranslate = async () => {
+const loadGoogleTranslateScript = (): Promise<void> => {
   const translateWindow = window as GoogleTranslateWindow;
+  const existing = document.getElementById('google-translate-script') as HTMLScriptElement | null;
 
-  // 1. Wait for Vue to finish its page-transition DOM updates
-  await nextTick();
-
-  // 2. Empty our target container so Vue stops fighting it
-  const container = document.getElementById('google_translate_element');
-  if (container) {
-    container.innerHTML = '';
+  if (translateWindow.google?.translate?.TranslateElement) {
+    return Promise.resolve();
   }
 
-  // 3. NUKE: Remove the old script and hidden iframes Google leaves behind
-  const oldScript = document.getElementById('google-translate-script');
-  if (oldScript) oldScript.remove();
-  
-  document.querySelectorAll('.goog-te-menu-frame').forEach((el) => el.remove());
+  return new Promise((resolve, reject) => {
+    const prevInit = translateWindow.googleTranslateElementInit;
+    translateWindow.googleTranslateElementInit = () => {
+      prevInit?.();
+      resolve();
+    };
 
-  // 4. NUKE: Delete the global translate object so Google is forced to start fresh
-  if (translateWindow.google?.translate) {
-    delete translateWindow.google.translate;
-  }
+    if (existing) {
+      existing.addEventListener('error', () => reject(new Error('Google Translate script failed')), { once: true });
+      // Script tag exists but TranslateElement may still be loading.
+      const check = window.setInterval(() => {
+        if (translateWindow.google?.translate?.TranslateElement) {
+          window.clearInterval(check);
+          resolve();
+        }
+      }, 50);
+      window.setTimeout(() => {
+        window.clearInterval(check);
+        if (!translateWindow.google?.translate?.TranslateElement) {
+          reject(new Error('Google Translate script timed out'));
+        }
+      }, 15000);
+      return;
+    }
 
-  // 5. Define the initialization callback
-  translateWindow.googleTranslateElementInit = () => {
+    const script = document.createElement('script');
+    script.id = 'google-translate-script';
+    script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.async = true;
+    script.onerror = () => reject(new Error('Google Translate script failed to load'));
+    document.body.appendChild(script);
+  });
+};
+
+const mountTranslateWidget = async () => {
+  if (typeof window === 'undefined' || isInitializing.value) return;
+
+  isInitializing.value = true;
+  try {
+    await nextTick();
+
+    const container = document.getElementById(elementId);
+    if (container) {
+      container.innerHTML = '';
+    }
+
+    await loadGoogleTranslateScript();
+
+    const translateWindow = window as GoogleTranslateWindow;
     const TranslateElement = translateWindow.google?.translate?.TranslateElement;
     if (!TranslateElement) return;
 
@@ -133,42 +183,39 @@ const loadGoogleTranslate = async () => {
         includedLanguages: INCLUDED_LANGUAGES,
         autoDisplay: false,
       },
-      'google_translate_element'
+      elementId,
     );
 
-    // Restore languages Google stripped (usually the current pageLanguage).
     ensureIncludedLanguagesInDropdown();
-    // Combo can appear a tick later on some loads — retry once.
     requestAnimationFrame(ensureIncludedLanguagesInDropdown);
-  };
-
-  // 6. Inject the brand new script
-  const script = document.createElement('script');
-  script.id = 'google-translate-script';
-  script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-  script.async = true;
-  document.body.appendChild(script);
+  } finally {
+    isInitializing.value = false;
+  }
 };
 
-onMounted(() => {
-  // Initial load
-  setTimeout(() => {
-    loadGoogleTranslate();
-  }, 100);
-});
+const activate = async () => {
+  if (isActivated.value) return;
+  isActivated.value = true;
+  await mountTranslateWidget();
+};
 
-// The SPA Fix: Run the nuke and rebuild process on every single page change!
-watch(() => route.path, () => {
-  setTimeout(() => {
-    loadGoogleTranslate();
-  }, 200); // A 200ms delay ensures Vue's virtual DOM is completely done moving things around
-});
+// Rebuild only after the user has opted in (SPA navigations / locale switches).
+watch(
+  () => route.path,
+  () => {
+    if (!isActivated.value) return;
+    setTimeout(() => {
+      void mountTranslateWidget();
+    }, 200);
+  },
+);
 
 watch(
   () => locale.value,
   () => {
+    if (!isActivated.value) return;
     setTimeout(() => {
-      loadGoogleTranslate();
+      void mountTranslateWidget();
     }, 200);
   },
 );
@@ -179,73 +226,77 @@ watch(
 .goog-logo-link,
 .goog-te-gadget span,
 .goog-te-gadget > div > a {
-    display: none !important;
+  display: none !important;
 }
 
 .goog-te-gadget {
-    color: transparent !important;
-    font-size: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 0 !important;
-    white-space: nowrap !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  white-space: nowrap !important;
 }
 
 /* 2. STYLE THE DROPDOWN MENU TO MATCH THE PREVIOUS UI */
-.goog-te-gadget .goog-te-combo {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    width: 126px !important;
-    max-width: 126px !important;
-    height: 28px !important;
-    color: #111827 !important;
-    background-color: #ffffff !important;
-    background-image:
-      linear-gradient(45deg, transparent 50%, #6b7280 50%),
-      linear-gradient(135deg, #6b7280 50%, transparent 50%),
-      linear-gradient(to right, #d1d5db, #d1d5db) !important;
-    background-position:
-      calc(100% - 12px) calc(50% - 3px),
-      calc(100% - 6px) calc(50% - 3px),
-      calc(100% - 1.45rem) 50% !important;
-    background-size: 5px 5px, 5px 5px, 1px 58% !important;
-    background-repeat: no-repeat !important;
-    border: 1px solid #d1d5db !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    line-height: 1 !important;
-    padding: 0 1.55rem 0 6px !important;
-    margin: 0 !important;
-    cursor: pointer !important;
-    outline: none !important;
-    vertical-align: middle !important;
-    text-overflow: clip !important;
+.goog-te-gadget .goog-te-combo,
+.translate-placeholder {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  width: 126px !important;
+  max-width: 126px !important;
+  height: 28px !important;
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6b7280 50%),
+    linear-gradient(135deg, #6b7280 50%, transparent 50%),
+    linear-gradient(to right, #d1d5db, #d1d5db) !important;
+  background-position:
+    calc(100% - 12px) calc(50% - 3px),
+    calc(100% - 6px) calc(50% - 3px),
+    calc(100% - 1.45rem) 50% !important;
+  background-size: 5px 5px, 5px 5px, 1px 58% !important;
+  background-repeat: no-repeat !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  padding: 0 1.55rem 0 6px !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  vertical-align: middle !important;
+  text-overflow: clip !important;
+  text-align: left;
 }
 
 .goog-te-gadget .goog-te-combo:hover,
-.goog-te-gadget .goog-te-combo:focus {
-    border-color: #9ca3af !important;
+.goog-te-gadget .goog-te-combo:focus,
+.translate-placeholder:hover,
+.translate-placeholder:focus {
+  border-color: #9ca3af !important;
 }
 
 /* 4. HIDE TOP BANNER & LAYOUT-BREAKING IFRAMES */
 .goog-te-banner-frame,
 iframe.goog-te-banner-frame,
 body > .skiptranslate {
-    display: none !important;
+  display: none !important;
 }
 
 .goog-te-gadget img {
-    display: none !important;
+  display: none !important;
 }
 
 .google-translate-wrapper {
-    max-width: 100%;
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    line-height: 1;
+  max-width: 100%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 </style>

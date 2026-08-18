@@ -409,6 +409,8 @@
       "currentPage": "Current Page is {page}",
       "goToPage": "Navigate to Page {page}",
       "languageSelector": "Open language select",
+      "loadTranslate": "Load Google Translate",
+      "translatePlaceholder": "Select language",
       "nextAriaLabel": "Navigate to next page",
       "openConfigurationDrawer": "Open configuration drawer",
       "openSearchModal": "Open item search",
@@ -1025,6 +1027,10 @@
     "priceInclVAT": "Incl. VAT",
     "reviewsCount": "{count} reviews",
     "showAllReviews": "Show all reviews",
+    "leasingo": {
+      "loadCalculator": "Load leasing calculator",
+      "loading": "Loading leasing calculator…"
+    },
     "graduatedPrices": {
       "discount": "DISCOUNT",
       "price": "PRICE",
