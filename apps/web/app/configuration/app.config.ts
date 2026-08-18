@@ -25,14 +25,7 @@ export const appConfiguration = {
     htmlAttrs: {
       lang: process.env.DEFAULTLANGUAGE ?? 'en',
     },
-    meta: [
-      { property: 'og:type', content: openGraph.type },
-      { property: 'og:image', content: openGraph.image },
-      { property: 'og:title', content: openGraph.title },
-      { property: 'og:url', content: process.env.API_ENDPOINT },
-    ],
-    // Leasingo (rateIndicator + calculator) is intentionally omitted from the
-    // global head. Scripts load only after user interaction on the product page
-    // (see PurchaseCard) so they do not count against initial-page transfer.
+    // Open Graph defaults live in app.vue (useSeoMeta) so product pages can override
+    // per-product og:title / og:description / og:image / og:url without duplicate tags.
   },
 };

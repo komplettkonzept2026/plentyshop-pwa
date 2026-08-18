@@ -113,27 +113,72 @@ export const useProduct: UseProductReturn = (slug) => {
   };
 
   /**
-   * @description Function for setting product title meta data
+   * @description Function for setting product title, description, keywords, and Open Graph meta.
+   * Overrides site-wide homepage OG tags from app.vue on product pages.
    */
   const setProductMeta = () => {
     const { titleSuffix } = useAppConfig();
+    const runtimeConfig = useRuntimeConfig();
+    const localePath = useLocalePath();
+    const route = useRoute();
+    const { addModernImageExtension } = useModernImage();
 
-    const title =
-      productGetters.getTitle(state.value.data) || `${productGetters.getName(state.value.data)} | ${titleSuffix}`;
+    const product = state.value.data;
+    const domain = String(runtimeConfig.public.domain || 'https://www.komplett-konzept.de').replace(/\/$/, '');
+
+    const stripHtml = (value: string | undefined | null): string => {
+      if (!value) return '';
+      return value
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    const toAbsoluteUrl = (url: string): string => {
+      if (!url) return '';
+      if (/^https?:\/\//i.test(url)) return url;
+      if (url.startsWith('//')) return `https:${url}`;
+      return `${domain}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
+
+    const productName = productGetters.getName(product) || '';
+    const seoTitle = productGetters.getTitle(product)?.trim();
+    const pageTitle = seoTitle || (productName ? `${productName} | ${titleSuffix}` : titleSuffix);
+    const ogTitle = seoTitle || productName || pageTitle;
+
+    const description =
+      stripHtml(productGetters.getMetaDescription(product)) ||
+      stripHtml(product.texts?.description) ||
+      productName;
+
+    const ogImage = toAbsoluteUrl(addModernImageExtension(productGetters.getCoverImage(product)));
+    const ogUrl = toAbsoluteUrl(localePath(route.path));
 
     useHead({
-      title,
+      title: pageTitle,
       titleTemplate: '',
       meta: [
         {
           name: 'description',
-          content: productGetters.getMetaDescription(state.value.data) || process.env.METADESC,
+          content: description || process.env.METADESC,
         },
         {
           name: 'keywords',
-          content: productGetters.getMetaKeywords(state.value.data) || process.env.METAKEYWORDS,
+          content: productGetters.getMetaKeywords(product) || process.env.METAKEYWORDS,
         },
       ],
+    });
+
+    useSeoMeta({
+      ogTitle,
+      ogDescription: description,
+      ogImage,
+      ogUrl,
+      ogType: 'website',
+      twitterCard: 'summary_large_image',
+      twitterTitle: ogTitle,
+      twitterDescription: description,
+      twitterImage: ogImage,
     });
   };
   const { disableActions } = useEditor();

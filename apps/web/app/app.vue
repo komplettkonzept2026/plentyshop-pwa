@@ -102,6 +102,7 @@ const { getSetting: getMetaKeywords } = useSiteSettings('metaKeywords');
 const { getSetting: getRobots } = useSiteSettings('robots');
 const { getSetting: getPrimaryColor } = useSiteSettings('primaryColor');
 
+const runtimeConfig = useRuntimeConfig();
 const title = ref(getMetaTitle());
 const ogTitle = ref(getOgTitle());
 const ogImage = ref(getOgImage());
@@ -110,6 +111,9 @@ const keywords = ref(getMetaKeywords());
 const robots = ref(getRobots());
 const fav = ref(getFavicon());
 const themeColor = ref(getPrimaryColor());
+const ogUrl = ref(String(runtimeConfig.public.domain || '').replace(/\/$/, '') || undefined);
+/** Product pages set their own OG tags in useProduct.setProductMeta — skip site defaults there. */
+const isProductPage = computed(() => route.meta?.type === 'product');
 
 watchEffect(() => {
   title.value = getMetaTitle();
@@ -124,8 +128,11 @@ watchEffect(() => {
 
 useSeoMeta({
   title: () => title.value,
-  ogTitle: () => ogTitle.value,
-  ogImage: () => ogImage.value,
+  ogTitle: () => (isProductPage.value ? undefined : ogTitle.value),
+  ogImage: () => (isProductPage.value ? undefined : ogImage.value),
+  ogDescription: () => (isProductPage.value ? undefined : description.value),
+  ogUrl: () => (isProductPage.value ? undefined : ogUrl.value),
+  ogType: () => (isProductPage.value ? undefined : 'website'),
   description: () => description.value,
   keywords: () => keywords.value,
   robots: () => robots.value,

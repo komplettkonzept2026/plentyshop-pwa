@@ -159,7 +159,7 @@ watch(
   },
 );
 
-// Product schema must always render on product pages (do not gate on category-tree match).
+// Product schema + Open Graph must always render on product pages (do not gate on category-tree match).
 watch(
   () => product.value,
   (currentProduct) => {
@@ -167,6 +167,7 @@ watch(
     setProductCanonicalMetaData(currentProduct);
     setProductRobotsMetaData(currentProduct);
     setProductMetaData(currentProduct);
+    setProductMeta();
   },
   { immediate: true },
 );
