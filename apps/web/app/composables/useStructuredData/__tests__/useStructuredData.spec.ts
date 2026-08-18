@@ -157,6 +157,26 @@ describe('useStructuredData', () => {
     });
   });
 
+  it('emits WebSite schema with SearchAction for the homepage sitelinks box', () => {
+    const { setWebsiteMeta } = useStructuredData();
+    setWebsiteMeta();
+
+    expect(getStructuredDataByKey('ld-website')).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Komplett Konzept',
+      url: 'https://www.komplett-konzept.de',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://www.komplett-konzept.de/search?term={search_term_string}',
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    });
+  });
+
   it('emits Product schema with Offer, return policy and shipping details when price is available', () => {
     const { setProductMetaData } = useStructuredData();
 

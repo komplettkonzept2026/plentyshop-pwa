@@ -1,6 +1,7 @@
 import type {
   useStructuredDataReturn,
   SetLogoMeta,
+  SetWebsiteMeta,
   SetProductMetaData,
   SetProductRobotsMetaData,
   SetProductCanonicalMetaData,
@@ -8,6 +9,7 @@ import type {
 } from './types';
 import { productGetters, reviewGetters, productSeoSettingsGetters } from '@plentymarkets/shop-api';
 import type { Product, CanonicalAlternate } from '@plentymarkets/shop-api';
+import { paths } from '~/utils/paths';
 
 const ORGANIZATION_LOGO =
   'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg';
@@ -104,6 +106,49 @@ export const useStructuredData: useStructuredDataReturn = () => {
       script: [
         {
           key: 'ld-organization',
+          type: 'application/ld+json',
+          innerHTML: JSON.stringify(structuredData),
+        },
+      ],
+    });
+
+    state.value.loading = false;
+  };
+
+  /**
+   * @description WebSite + SearchAction JSON-LD for the homepage (sitelinks search box).
+   * @example
+   * ``` ts
+   * setWebsiteMeta()
+   * ```
+   */
+  const setWebsiteMeta: SetWebsiteMeta = () => {
+    state.value.loading = true;
+
+    const runtimeConfig = useRuntimeConfig();
+    const localePath = useLocalePath();
+    const domain = normalizeDomain(String(runtimeConfig.public.domain || 'https://www.komplett-konzept.de'));
+    const searchPath = localePath(paths.search);
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Komplett Konzept',
+      url: domain,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${domain}${searchPath}?term={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    };
+
+    useHead({
+      script: [
+        {
+          key: 'ld-website',
           type: 'application/ld+json',
           innerHTML: JSON.stringify(structuredData),
         },
@@ -353,6 +398,7 @@ export const useStructuredData: useStructuredDataReturn = () => {
 
   return {
     setLogoMeta,
+    setWebsiteMeta,
     setProductMetaData,
     setProductRobotsMetaData,
     setProductCanonicalMetaData,
