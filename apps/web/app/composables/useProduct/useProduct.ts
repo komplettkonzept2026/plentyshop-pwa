@@ -166,6 +166,7 @@ export const useProduct: UseProductReturn = (slug) => {
           name: 'keywords',
           content: productGetters.getMetaKeywords(product) || process.env.METAKEYWORDS,
         },
+        { property: 'og:type', content: 'product' },
       ],
     });
 
@@ -174,7 +175,6 @@ export const useProduct: UseProductReturn = (slug) => {
       ogDescription: description,
       ogImage,
       ogUrl,
-      ogType: 'website',
       twitterCard: 'summary_large_image',
       twitterTitle: ogTitle,
       twitterDescription: description,

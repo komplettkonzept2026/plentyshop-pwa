@@ -111,7 +111,7 @@ const keywords = ref(getMetaKeywords());
 const robots = ref(getRobots());
 const fav = ref(getFavicon());
 const themeColor = ref(getPrimaryColor());
-const ogUrl = ref(String(runtimeConfig.public.domain || '').replace(/\/$/, '') || undefined);
+const ogUrl = ref(String(runtimeConfig.public.domain || '').replace(/\/?$/, '/') || undefined);
 /** Product pages set their own OG tags in useProduct.setProductMeta — skip site defaults there. */
 const isProductPage = computed(() => route.meta?.type === 'product');
 
