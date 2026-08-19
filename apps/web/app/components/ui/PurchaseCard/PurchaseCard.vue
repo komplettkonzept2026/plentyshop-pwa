@@ -248,29 +248,17 @@
                   </i18n-t>
                 </div>
                 <template v-if="showPayPalButtons">
-                  <button
-                    v-if="!hasRequestedPayPal"
-                    type="button"
-                    class="mt-4 inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded font-bold text-sm transition-colors hover:opacity-90"
-                    style="background: #0070ba; color: #ffffff;"
-                    data-testid="paypal-load"
-                    @click="requestPayPal"
-                  >
-                    {{ t('product.paypal.loadOptions') }}
-                  </button>
-                  <template v-else>
-                    <PayPalExpressButton
-                      type="SingleItem"
-                      location="itemPage"
-                      class="mt-4"
-                      @validation-callback="paypalHandleAddToCart"
-                    />
-                    <PayPalPayLaterBanner
-                      placement="product"
-                      location="itemPage"
-                      :amount="displayPriceWithProperties * quantitySelectorValue"
-                    />
-                  </template>
+                  <PayPalExpressButton
+                    type="SingleItem"
+                    location="itemPage"
+                    class="mt-4"
+                    @validation-callback="paypalHandleAddToCart"
+                  />
+                  <PayPalPayLaterBanner
+                    placement="product"
+                    location="itemPage"
+                    :amount="displayPriceWithProperties * quantitySelectorValue"
+                  />
                 </template>
               </div>
 
@@ -617,18 +605,10 @@ const changeQuantity = (quantity: string) => {
 const isSalableText = computed(() => (productGetters.isSalable(props?.product) ? '' : t('product.notAvailable')));
 const isNotValidVariation = computed(() => (getCombination() ? '' : t('product.attributes.notValidVariation')));
 const showPayPalButtons = computed(() => Boolean(getCombination()) && productGetters.isSalable(props?.product));
-/**
- * Avoid initial-load PayPal/Google Pay SDK cost on PDPs; render payment widgets only after explicit intent.
- */
-const hasRequestedPayPal = ref(false);
 const manufacturerName = computed(() => {
   const manufacturer = productGetters.getManufacturer(props.product);
   return manufacturer?.name || '';
 });
-
-const requestPayPal = () => {
-  hasRequestedPayPal.value = true;
-};
 
 // const scrollToReviews = () => {
 //   if (!isReviewsAccordionOpen()) {
