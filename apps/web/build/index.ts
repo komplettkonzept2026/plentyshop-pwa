@@ -13,6 +13,12 @@ dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 });
 
+// master-staging only: Plenty test-drive (do not merge to main)
+process.env.API_ENDPOINT = 'https://162667ef47.plenty-test-drive.eu';
+process.env.API_SECURITY_TOKEN = 'MTYyNjZfS004aDV2blVpSjVIOWpsaVlHcTBpUkpMVThXZUJCY2JlZHhIbHZxQzlYTDI4bExpem4=';
+process.env.CONFIG_ID = '1';
+process.env.FETCH_REMOTE_CONFIG = '0';
+
 const main = async () => {
   const configKeys = [
     'NUXT_PUBLIC_PRIMARY_COLOR',
