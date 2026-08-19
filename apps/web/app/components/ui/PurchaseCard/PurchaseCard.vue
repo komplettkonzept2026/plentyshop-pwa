@@ -256,7 +256,16 @@
                     data-testid="paypal-load"
                     @click="requestPayPal"
                   >
-                    {{ t('product.paypal.loadOptions') }}
+                    <span class="sr-only">{{ t('product.paypal.loadOptions') }}</span>
+                    <span class="inline-flex items-center justify-center gap-2">
+                      <span
+                        aria-hidden="true"
+                        class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/95 text-[#003087] font-black leading-none"
+                      >
+                        P
+                      </span>
+                      <span>PayPal</span>
+                    </span>
                   </button>
                   <template v-else>
                     <PayPalExpressButton
