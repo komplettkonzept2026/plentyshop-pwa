@@ -9,8 +9,8 @@
       />
     </template>
     <template v-else-if="useLocalOptimizedLogo">
-      <source type="image/avif" srcset="/_nuxt-plenty/images/logo-header.avif" />
       <source type="image/webp" srcset="/_nuxt-plenty/images/logo-header.webp" />
+      <source type="image/avif" srcset="/_nuxt-plenty/images/logo-header.avif" />
       <img
         id="logo"
         ref="logo"

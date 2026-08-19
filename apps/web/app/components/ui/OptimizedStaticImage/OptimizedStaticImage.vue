@@ -1,7 +1,7 @@
 <template>
   <picture>
-    <source v-if="avifSrc" type="image/avif" :srcset="avifSrc" />
     <source v-if="webpSrc" type="image/webp" :srcset="webpSrc" />
+    <source v-if="avifSrc" type="image/avif" :srcset="avifSrc" />
     <img
       :src="fallbackSrc"
       :alt="alt"
