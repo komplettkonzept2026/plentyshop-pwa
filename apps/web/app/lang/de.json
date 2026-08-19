@@ -1036,9 +1036,7 @@
       "loadCalculator": "Leasingrechner laden",
       "loading": "Leasingrechner wird geladen…"
     },
-    "paypal": {
-      "loadOptions": "PayPal-Optionen laden"
-    },
+    
     "graduatedPrices": {
       "discount": "RABATT",
       "price": "PREIS",
