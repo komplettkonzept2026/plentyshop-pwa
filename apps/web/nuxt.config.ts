@@ -86,6 +86,7 @@ export default defineNuxtConfig({
     '/_nuxt-plenty/icons/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
     '/_nuxt-plenty/favicon.ico': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
     '/_nuxt-plenty/images/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
+    '/_nuxt-plenty/images/**/*.avif': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
     '/_nuxt-plenty/fonts/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
   },
   image: {
