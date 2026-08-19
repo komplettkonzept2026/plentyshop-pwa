@@ -6,6 +6,12 @@ import { appConfiguration } from './app/configuration/app.config';
 import { paths } from './app/utils/paths';
 import { resolve } from 'pathe';
 
+// master-staging only: Plenty test-drive (do not merge to main)
+process.env.API_ENDPOINT = 'https://162667ef47.plenty-test-drive.eu';
+process.env.API_SECURITY_TOKEN = 'MTYyNjZfS004aDV2blVpSjVIOWpsaVlHcTBpUkpMVThXZUJCY2JlZHhIbHZxQzlYTDI4bExpem4=';
+process.env.CONFIG_ID = '1';
+process.env.FETCH_REMOTE_CONFIG = '0';
+
 export default defineNuxtConfig({
   srcDir: 'app/',
   telemetry: false,
@@ -187,7 +193,7 @@ export default defineNuxtConfig({
       homepageCategoryId: Number(process.env.HOMEPAGE) ?? null,
       storename: process.env.NAME || 'PlentyONE GmbH',
       noCache: process.env.NO_CACHE || '',
-      configId: process.env.CONFIG_ID || '',
+      configId: process.env.CONFIG_ID || '1',
       isHero: true,
       font: process.env.NUXT_PUBLIC_FONT || 'Red Hat Text',
       blockSize: process.env.NUXT_PUBLIC_BLOCK_SIZE || 'm',

@@ -7,9 +7,10 @@ export default defineEventHandler(async (event) => {
   // Return empty if no ID was provided
   if (!variationId) return { entries: [] };
 
-  // Securely load your Plentymarkets credentials from the .env file
-  const apiEndpoint = process.env.API_ENDPOINT || 'https://www.komplett-konzept.de';
-  const securityToken = process.env.API_SECURITY_TOKEN;
+  // master-staging only: Plenty test-drive (do not merge to main)
+  const apiEndpoint = process.env.API_ENDPOINT || 'https://162667ef47.plenty-test-drive.eu';
+  const securityToken =
+    process.env.API_SECURITY_TOKEN || 'MTYyNjZfS004aDV2blVpSjVIOWpsaVlHcTBpUkpMVThXZUJCY2JlZHhIbHZxQzlYTDI4bExpem4=';
 
   try {
     // 1. Use standard 'fetch' instead of '$fetch' to bypass the TypeScript error
