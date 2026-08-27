@@ -79,7 +79,7 @@ export const useStructuredData: useStructuredDataReturn = () => {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: 'Komplett Konzept',
-      legalName: 'Komplett Konzept GmbH',
+      legalName: 'Komplett Konzept Verwertungs GmbH',
       url: `${domain}/`,
       logo: ORGANIZATION_LOGO,
       address: {
@@ -92,7 +92,9 @@ export const useStructuredData: useStructuredDataReturn = () => {
       contactPoint: {
         '@type': 'ContactPoint',
         telephone: '+49-2862-587950',
+        email: 'info@komplett-konzept.de',
         contactType: 'customer service',
+        areaServed: 'DE',
         availableLanguage: ['German', 'English'],
       },
       sameAs: [
