@@ -78,8 +78,7 @@ export const useStructuredData: useStructuredDataReturn = () => {
     const structuredData = {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'Komplett Konzept Verwertungs GmbH',
-      alternateName: 'Komplett Konzept',
+      name: 'Komplett Konzept',
       legalName: 'Komplett Konzept Verwertungs GmbH',
       url: `${domain}/`,
       logo: ORGANIZATION_LOGO,
