@@ -6,11 +6,8 @@ import { appConfiguration } from './app/configuration/app.config';
 import { paths } from './app/utils/paths';
 import { resolve } from 'pathe';
 
-// master-staging only: Plenty test-drive (do not merge to main)
-process.env.API_ENDPOINT = 'https://162667ef47.plenty-test-drive.eu';
-process.env.API_SECURITY_TOKEN = 'MTYyNjZfS004aDV2blVpSjVIOWpsaVlHcTBpUkpMVThXZUJCY2JlZHhIbHZxQzlYTDI4bExpem4=';
-process.env.CONFIG_ID = '1';
-process.env.FETCH_REMOTE_CONFIG = '0';
+// API credentials come from apps/web/.env (API_ENDPOINT, API_SECURITY_TOKEN, CONFIG_ID).
+// Do not hardcode the Plenty test-drive here — that forced the fallback "PlentyONE Shop" UI.
 
 export default defineNuxtConfig({
   srcDir: 'app/',
@@ -71,6 +68,7 @@ export default defineNuxtConfig({
       ],
     },
     build: {
+      cssCodeSplit: true,
       rollupOptions: {
         output: {
           manualChunks: {
@@ -79,6 +77,11 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+  // Prefer linked CSS over inlining the full Tailwind+app bundle into every SSR HTML
+  // document. Category pages were already ~1.8 MB; inlined CSS made first paint slower.
+  features: {
+    inlineStyles: false,
   },
   // TODO: build is consistently failing because of this. check whether we need pre-render check.
   nitro: {

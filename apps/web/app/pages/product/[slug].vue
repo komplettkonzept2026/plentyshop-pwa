@@ -101,15 +101,6 @@ const fetchProductWithTimeout = async () => {
 
 const productLoaded = await fetchProductWithTimeout();
 
-interface ProductWithNetStock extends Product {
-  stock?: {
-    net: number;
-  };
-}
-const productWithNetStock = product.value as ProductWithNetStock;
-// Support requested debug: verify net stock is present after fetch
-console.log('net stock', productWithNetStock?.stock?.net);
-
 if (!productLoaded || Object.keys(product.value).length === 0) {
   throw createError({
     statusCode: 404,
@@ -208,3 +199,6 @@ onBeforeRouteLeave(() => {
 
 onNuxtReady(() => observeRecommendedSection());
 </script>
+<style lang="scss">
+@use '~/assets/style-product.scss';
+</style>

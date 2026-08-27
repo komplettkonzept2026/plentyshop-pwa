@@ -8,7 +8,7 @@
         <SfIconChevronLeft :class="['text-neutral-500', open ? 'rotate-90' : '-rotate-90']" />
       </div>
     </template>
-    <div v-if="facetGetters.getType(facet) === 'feedback'">
+    <div v-if="open && facetGetters.getType(facet) === 'feedback'">
       <SfListItem v-for="(filter, index) in sortedReviews(facet)" :key="index" tag="label" class="mb-3" size="sm">
         <div class="flex items-center space-x-2">
           <span class="pt-1 flex items-center">
@@ -37,7 +37,11 @@
       </SfListItem>
     </div>
 
-    <form v-else-if="facetGetters.getType(facet) === 'price'" class="mb-4 px-4" @submit.prevent="updatePriceFilter">
+    <form
+      v-else-if="open && facetGetters.getType(facet) === 'price'"
+      class="mb-4 px-4"
+      @submit.prevent="updatePriceFilter"
+    >
       <div class="mb-3">
         <label for="min">
           <UiFormLabel class="text-start">{{ t('common.labels.min') }}</UiFormLabel>
@@ -74,9 +78,9 @@
       </div>
     </form>
 
-    <div v-else class="mb-4">
+    <div v-else-if="open" class="mb-4">
       <SfListItem
-        v-for="(filter, index) in facetGetters.getFilters(facet)"
+        v-for="(filter, index) in visibleFilters"
         :key="index"
         tag="label"
         size="sm"
@@ -117,15 +121,24 @@ import {
 } from '@storefront-ui/vue';
 import type { FilterProps } from '~/components/CategoryFilters/types';
 import type { Filters } from '~/composables';
+import { isRealManufacturerName } from '~/utils/placeholderManufacturer';
 
 const { getFacetsFromURL, updateFilters, updatePrices } = useCategoryFilter();
 
-const open = ref(true);
+const open = ref(false);
 const props = defineProps<FilterProps>();
 const filters = facetGetters.getFilters(props.facet ?? ({} as FilterGroup)) as Filter[];
 const models = ref({} as Filters);
 
-// Price
+const isProducerFacet = computed(
+  () => !!props.facet && facetGetters.getType(props.facet) === 'producer',
+);
+
+const visibleFilters = computed(() => {
+  if (!isProducerFacet.value) return filters;
+  return filters.filter((filter) => isRealManufacturerName(filter.name));
+});
+
 const minPrice = ref(getFacetsFromURL().priceMin ?? '');
 const maxPrice = ref(getFacetsFromURL().priceMax ?? '');
 
@@ -144,7 +157,7 @@ function resetPriceFilter() {
 
 const updateFilter = () => {
   const currentFacets = getFacetsFromURL().facets?.split(',') ?? [];
-  for (const filter of filters) {
+  for (const filter of visibleFilters.value) {
     const filterId = typeof filter.id === 'string' ? filter.id : filter.id.toString();
 
     models.value[filterId] = currentFacets.includes(filterId);
@@ -152,11 +165,11 @@ const updateFilter = () => {
 };
 
 const facetChange = (changedFilter?: Filter) => {
-  if (props.facet && facetGetters.getType(props.facet) === 'producer' && changedFilter) {
+  if (isProducerFacet.value && changedFilter) {
     const changedFilterId = typeof changedFilter.id === 'string' ? changedFilter.id : changedFilter.id.toString();
 
     if (models.value[changedFilterId]) {
-      for (const filter of filters) {
+      for (const filter of visibleFilters.value) {
         const filterId = typeof filter.id === 'string' ? filter.id : filter.id.toString();
         models.value[filterId] = filterId === changedFilterId;
       }

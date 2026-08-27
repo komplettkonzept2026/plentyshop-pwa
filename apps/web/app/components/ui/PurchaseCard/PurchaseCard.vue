@@ -711,28 +711,4 @@ watch(
   { immediate: true },
 );
 // --- LEASINGO INTEGRATION END ---
-// --- DEBUGGING STOCK ---
-watch(
-  () => props.product,
-  (p) => {
-    // eslint-disable-next-line no-console
-    // console.log('🔍 STOCK CHECK 🔍');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawStock = (p as any)?.stock;
-    // eslint-disable-next-line no-console
-    console.log('Raw Stock Object:', rawStock);
-
-    if (!rawStock) {
-      // eslint-disable-next-line no-console
-      console.warn('⚠️ API is NOT sending stock data. Backend setting is OFF.');
-    } else if (rawStock.net === undefined) {
-      // eslint-disable-next-line no-console
-      console.warn('⚠️ API sent stock object, but "net" is missing/hidden.');
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('✅ SUCCESS! Net Stock is:', rawStock.net);
-    }
-  },
-  { immediate: true, deep: true },
-);
 </script>
