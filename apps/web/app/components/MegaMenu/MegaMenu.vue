@@ -5,7 +5,7 @@
       :style="{ backgroundColor: headerBackgroundColor }"
       data-testid="navbar-top"
     >
-      <div class="flex items-center py-2 lg:py-0">
+      <div class="flex shrink-0 items-center py-2 lg:py-0">
         <UiButton
           v-if="viewport.isLessThan('lg')"
           variant="tertiary"

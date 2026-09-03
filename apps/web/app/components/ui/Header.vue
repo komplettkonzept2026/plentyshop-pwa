@@ -319,10 +319,14 @@ const allowedCategoryIds = [895, 490, 1505, 208, 81, 217, 97];
 const filteredCategoryTree = computed(() => {
   if (!categoryTree.value) return [];
 
-  // Filter the main top-level categories
-  return categoryTree.value.filter((category: { id: number }) => {
+  const allowedCategories = categoryTree.value.filter((category: { id: number; right?: string }) => {
     return allowedCategoryIds.includes(category.id);
   });
+
+  if (allowedCategories.length > 0) return allowedCategories;
+
+  // Fallback for configs whose category ids do not match the custom allowlist.
+  return categoryTree.value.filter((category: { right?: string }) => category.right !== 'none');
 });
 const { user, isAuthorized, logout } = useCustomer();
 const viewport = useViewport();
