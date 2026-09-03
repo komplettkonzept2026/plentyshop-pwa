@@ -47,8 +47,11 @@ const isLightBackground = (color: string): boolean => {
   }
 
   const rgbMatch = normalized.match(/(\d+)\D+(\d+)\D+(\d+)/);
-  if (rgbMatch) {
-    const [, red, green, blue] = rgbMatch.map(Number);
+  if (rgbMatch?.[1] && rgbMatch[2] && rgbMatch[3]) {
+    const red = Number(rgbMatch[1]);
+    const green = Number(rgbMatch[2]);
+    const blue = Number(rgbMatch[3]);
+    if ([red, green, blue].some(Number.isNaN)) return true;
     return red * 0.299 + green * 0.587 + blue * 0.114 > 186;
   }
 
