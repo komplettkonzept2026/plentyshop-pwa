@@ -1,12 +1,41 @@
 <template>
-  <img
-    id="logo"
-    ref="logo"
-    :src="headerLogo"
-    :alt="`${storeName} logo`"
-    :class="logoClasses"
-    fetchpriority="high"
-  />
+  <picture>
+    <template v-if="isSvgLogo">
+      <NuxtImg
+        id="logo"
+        ref="logo"
+        :src="headerLogo"
+        :alt="`${storeName} logo`"
+        :class="logoClasses"
+      />
+    </template>
+    <template v-else-if="useLocalOptimizedLogo">
+      <source type="image/webp" srcset="/_nuxt-plenty/images/logo-header.webp" />
+      <source type="image/avif" srcset="/_nuxt-plenty/images/logo-header.avif" />
+      <img
+        id="logo"
+        ref="logo"
+        src="/_nuxt-plenty/images/logo-header.jpg"
+        :alt="`${storeName} logo`"
+        :class="logoClasses"
+        width="800"
+        height="391"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </template>
+    <template v-else>
+      <img
+        id="logo"
+        ref="logo"
+        :src="headerLogo"
+        :alt="`${storeName} logo`"
+        :class="logoClasses"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </template>
+  </picture>
 </template>
 
 <script setup lang="ts">
@@ -16,6 +45,7 @@ const { getSetting: getHeaderBackgroundColor } = useSiteSettings('headerBackgrou
 
 const headerLogo = computed(() => getHeaderLogo());
 const storeName = runtimeConfig.public.storename;
+const useLocalOptimizedLogo = computed(() => /Logo_ohne_GmbH\.jpe?g/i.test(headerLogo.value || ''));
 
 const isSvgLogo = computed(() => headerLogo.value.split('?')[0]?.toLowerCase().endsWith('.svg') ?? false);
 

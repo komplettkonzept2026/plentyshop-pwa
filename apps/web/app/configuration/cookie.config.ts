@@ -65,7 +65,16 @@ export default {
       name: 'CookieBar.marketing.label',
       showMore: false,
       description: 'CookieBar.marketing.description',
-      cookies: [],
+      cookies: [
+        {
+          name: 'CookieBar.marketing.cookies.gtm.name',
+          Provider: 'CookieBar.marketing.cookies.gtm.provider',
+          Status: 'CookieBar.marketing.cookies.gtm.status',
+          PrivacyPolicy: '/PrivacyPolicy',
+          Lifespan: 'Session',
+          accepted: false,
+        },
+      ],
     },
   ],
 } as CookieGroupFromNuxtConfig;
