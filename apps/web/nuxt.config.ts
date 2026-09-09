@@ -6,11 +6,8 @@ import { appConfiguration } from './app/configuration/app.config';
 import { paths } from './app/utils/paths';
 import { resolve } from 'pathe';
 
-// master-staging only: Plenty test-drive (do not merge to main)
-//process.env.API_ENDPOINT = 'https://162667ef47.plenty-test-drive.eu';
-//process.env.API_SECURITY_TOKEN = 'MTYyNjZfS004aDV2blVpSjVIOWpsaVlHcTBpUkpMVThXZUJCY2JlZHhIbHZxQzlYTDI4bExpem4=';
-//process.env.CONFIG_ID = '1';
-//process.env.FETCH_REMOTE_CONFIG = '0';
+// API credentials come from apps/web/.env (API_ENDPOINT, API_SECURITY_TOKEN, CONFIG_ID).
+// Do not hardcode the Plenty test-drive here — that forced the fallback "PlentyONE Shop" UI.
 
 export default defineNuxtConfig({
   srcDir: 'app/',
@@ -189,7 +186,7 @@ export default defineNuxtConfig({
       headerLogo:
         process.env.NUXT_PUBLIC_HEADER_LOGO ||
         process.env.LOGO ||
-        'https://cdn02.plentymarkets.com/mevofvd5omld/frontend/Logo/logo.svg',
+        'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg',
       homepageCategoryId: Number(process.env.HOMEPAGE) ?? null,
       storename: process.env.NAME || 'PlentyONE GmbH',
       noCache: process.env.NO_CACHE || '',

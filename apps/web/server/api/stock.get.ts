@@ -7,10 +7,13 @@ export default defineEventHandler(async (event) => {
   // Return empty if no ID was provided
   if (!variationId) return { entries: [] };
 
-  // master-staging only: Plenty test-drive (do not merge to main)
-  const apiEndpoint = process.env.API_ENDPOINT || 'https://162667ef47.plenty-test-drive.eu';
-  const securityToken =
-    process.env.API_SECURITY_TOKEN || 'MTYyNjZfS004aDV2blVpSjVIOWpsaVlHcTBpUkpMVThXZUJCY2JlZHhIbHZxQzlYTDI4bExpem4=';
+  const apiEndpoint = process.env.API_ENDPOINT || 'https://www.komplett-konzept.de';
+  const securityToken = process.env.API_SECURITY_TOKEN || '';
+
+  if (!securityToken) {
+    console.error('API_SECURITY_TOKEN is not set');
+    return { entries: [] };
+  }
 
   try {
     // 1. Use standard 'fetch' instead of '$fetch' to bypass the TypeScript error
