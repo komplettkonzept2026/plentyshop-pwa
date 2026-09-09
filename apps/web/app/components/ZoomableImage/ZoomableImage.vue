@@ -13,24 +13,24 @@
     <template v-if="!isMobile && imagesLoaded[`gallery-img-${index}`]">
       <template v-if="disableZoom">
         <picture>
-          <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
           <source v-if="webpSrcset" type="image/webp" :srcset="webpSrcset" :sizes="sizesAttr" />
+          <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
           <img v-bind="imgProps" :data-testid="`product-image-${index}`" @load="onImageLoad" />
         </picture>
       </template>
 
       <Drift v-else :key="route.fullPath" :index="index">
         <picture>
-          <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
           <source v-if="webpSrcset" type="image/webp" :srcset="webpSrcset" :sizes="sizesAttr" />
+          <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
           <img v-bind="imgProps" :data-testid="`product-image-${index}`" @load="onImageLoad" />
         </picture>
       </Drift>
     </template>
 
     <picture v-else>
-      <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
       <source v-if="webpSrcset" type="image/webp" :srcset="webpSrcset" :sizes="sizesAttr" />
+      <source v-if="avifSrcset" type="image/avif" :srcset="avifSrcset" :sizes="sizesAttr" />
       <img
         v-bind="imgProps"
         :data-testid="`product-image-${index}`"

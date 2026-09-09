@@ -60,27 +60,8 @@
 <script setup lang="ts">
 useHead({
   meta: [
-    // 1. Google Site Verification
     { name: 'google-site-verification', content: 'worWAYL13GxCwenukPnwr8MRJPEhirgLjZ3_iQPZS20' }
   ],
-  script: [
-    // 2. Google Tag Manager
-    {
-      innerHTML: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-P2DD2N58');`,
-      type: 'text/javascript',
-    }
-  ],
-  noscript: [
-    // 3. Google Tag Manager (Noscript) forced to open immediately after <body>
-    {
-      innerHTML: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P2DD2N58" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
-      tagPosition: 'bodyOpen' as const
-    }
-  ]
 });
 const { $isPreview } = useNuxtApp();
 const bodyClass = ref('');

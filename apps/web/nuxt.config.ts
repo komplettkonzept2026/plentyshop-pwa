@@ -94,7 +94,9 @@ export default defineNuxtConfig({
     '/_ipx/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
     '/_nuxt-plenty/icons/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
     '/_nuxt-plenty/favicon.ico': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
-    '/_nuxt-plenty/images/**': { headers: { 'cache-control': `max-age=604800` } },
+    '/_nuxt-plenty/images/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
+    '/_nuxt-plenty/images/**/*.avif': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
+    '/_nuxt-plenty/fonts/**': { headers: { 'cache-control': `public, max-age=31536000, immutable` } },
   },
   image: {
     provider: 'none',
@@ -190,7 +192,7 @@ export default defineNuxtConfig({
       headerLogo:
         process.env.NUXT_PUBLIC_HEADER_LOGO ||
         process.env.LOGO ||
-        'https://cdn02.plentymarkets.com/mevofvd5omld/frontend/Logo/logo.svg',
+        'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg',
       homepageCategoryId: Number(process.env.HOMEPAGE) ?? null,
       storename: process.env.NAME || 'PlentyONE GmbH',
       noCache: process.env.NO_CACHE || '',
@@ -280,7 +282,7 @@ export default defineNuxtConfig({
   },
   fonts: {
     defaults: {
-      weights: [300, 400, 500, 700],
+      weights: [400, 700],
       preload: true,
     },
     assets: {
@@ -359,7 +361,7 @@ export default defineNuxtConfig({
     workbox: {
       maximumFileSizeToCacheInBytes: 5000000,
       navigateFallback: null,
-      globPatterns: ['**/*.{js,json,css,html,ico,svg,png,webp,ico,woff,woff2,ttf,eit,otf}', '_nuxt-plenty/icons/*'],
+      globPatterns: ['**/*.{js,json,css,html,ico,svg,png,webp,avif,woff,woff2,ttf,eit,otf}', '_nuxt-plenty/icons/*'],
       globIgnores: ['manifest**.webmanifest'],
       additionalManifestEntries: [
         {
@@ -380,7 +382,7 @@ export default defineNuxtConfig({
         },
         {
           urlPattern: ({ request }) => request.destination === 'image',
-          handler: 'NetworkFirst',
+          handler: 'CacheFirst',
           options: {
             cacheName: 'plenty-image-cache',
             expiration: {
@@ -394,7 +396,7 @@ export default defineNuxtConfig({
         },
         {
           urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-          handler: 'NetworkFirst',
+          handler: 'CacheFirst',
           options: {
             cacheName: 'google-fonts-cache',
             expiration: {
@@ -408,7 +410,7 @@ export default defineNuxtConfig({
         },
         {
           urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-          handler: 'NetworkFirst',
+          handler: 'CacheFirst',
           options: {
             cacheName: 'gstatic-fonts-cache',
             expiration: {

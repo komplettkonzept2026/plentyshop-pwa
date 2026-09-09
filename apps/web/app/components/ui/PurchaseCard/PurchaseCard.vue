@@ -263,10 +263,14 @@
               </div>
 
               <div class="mt-6 mb-4 flex justify-center w-full min-w-0">
-                <img 
-                  src="/_nuxt-plenty/images/wider_version_opt.jpg" 
-                  alt="Komplett Konzept" 
-                  class="max-w-full w-auto h-auto object-contain rounded shadow-sm" 
+                <UiOptimizedStaticImage
+                  base-src="/_nuxt-plenty/images/wider_version_opt"
+                  fallback-ext="jpg"
+                  alt="Komplett Konzept"
+                  img-class="max-w-full w-auto h-auto object-contain rounded shadow-sm"
+                  :width="400"
+                  :height="251"
+                  loading="lazy"
                 />
               </div>
               

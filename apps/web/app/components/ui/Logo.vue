@@ -1,12 +1,27 @@
 <template>
   <picture>
-    <template v-if="imageExtension === 'svg'">
+    <template v-if="isSvgLogo">
       <NuxtImg
+        id="logo"
         ref="logo"
         :src="headerLogo"
         :alt="`${storeName} logo`"
-        class="h-[50px] lg:h-[62px] min-[1152px]:h-[72px] min-[1280px]:h-[96px] min-[1367px]:h-[126px] w-auto object-contain scale-[1.1] origin-left transition-all duration-300"
-        preload
+        :class="logoClasses"
+      />
+    </template>
+    <template v-else-if="useLocalOptimizedLogo">
+      <source type="image/webp" srcset="/_nuxt-plenty/images/logo-header.webp" />
+      <source type="image/avif" srcset="/_nuxt-plenty/images/logo-header.avif" />
+      <img
+        id="logo"
+        ref="logo"
+        src="/_nuxt-plenty/images/logo-header.jpg"
+        :alt="`${storeName} logo`"
+        :class="logoClasses"
+        width="800"
+        height="391"
+        decoding="async"
+        fetchpriority="high"
       />
     </template>
     <template v-else>
@@ -15,8 +30,9 @@
         ref="logo"
         :src="headerLogo"
         :alt="`${storeName} logo`"
-        class="h-[50px] lg:h-[62px] min-[1152px]:h-[72px] min-[1280px]:h-[96px] min-[1367px]:h-[126px] w-auto object-contain scale-[1.1] origin-left transition-all duration-300"
-        preload
+        :class="logoClasses"
+        decoding="async"
+        fetchpriority="high"
       />
     </template>
   </picture>
@@ -25,10 +41,55 @@
 <script setup lang="ts">
 const runtimeConfig = useRuntimeConfig();
 const { getSetting: getHeaderLogo } = useSiteSettings('headerLogo');
+const { getSetting: getHeaderBackgroundColor } = useSiteSettings('headerBackgroundColor');
 
 const headerLogo = computed(() => getHeaderLogo());
-
 const storeName = runtimeConfig.public.storename;
+const useLocalOptimizedLogo = computed(() => /Logo_ohne_GmbH\.jpe?g/i.test(headerLogo.value || ''));
 
-const imageExtension = computed(() => headerLogo.value.split('.').pop());
+const isSvgLogo = computed(() => headerLogo.value.split('?')[0]?.toLowerCase().endsWith('.svg') ?? false);
+
+const isLightBackground = (color: string): boolean => {
+  if (!color) return true;
+
+  const normalized = color.trim().toLowerCase();
+
+  if (normalized === '#fff' || normalized === '#ffffff' || normalized === 'white') {
+    return true;
+  }
+
+  if (normalized.startsWith('#')) {
+    const hex = normalized.slice(1);
+    const value =
+      hex.length === 3
+        ? hex
+            .split('')
+            .map((char) => char + char)
+            .join('')
+        : hex.slice(0, 6);
+    const red = Number.parseInt(value.slice(0, 2), 16);
+    const green = Number.parseInt(value.slice(2, 4), 16);
+    const blue = Number.parseInt(value.slice(4, 6), 16);
+
+    if ([red, green, blue].some(Number.isNaN)) return true;
+
+    return red * 0.299 + green * 0.587 + blue * 0.114 > 186;
+  }
+
+  const rgbMatch = normalized.match(/(\d+)\D+(\d+)\D+(\d+)/);
+  if (rgbMatch?.[1] && rgbMatch[2] && rgbMatch[3]) {
+    const red = Number(rgbMatch[1]);
+    const green = Number(rgbMatch[2]);
+    const blue = Number(rgbMatch[3]);
+    if ([red, green, blue].some(Number.isNaN)) return true;
+    return red * 0.299 + green * 0.587 + blue * 0.114 > 186;
+  }
+
+  return true;
+};
+
+const logoClasses = computed(() => [
+  'h-[50px] lg:h-[62px] min-[1152px]:h-[72px] min-[1280px]:h-[96px] min-[1367px]:h-[126px] w-auto object-contain scale-[1.1] origin-left transition-all duration-300',
+  isSvgLogo.value && isLightBackground(getHeaderBackgroundColor()) ? 'brightness-0' : '',
+]);
 </script>
