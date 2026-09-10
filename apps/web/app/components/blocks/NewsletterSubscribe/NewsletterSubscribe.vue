@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import { SfCheckbox, SfInput } from '@storefront-ui/vue';
+import { SfCheckbox, SfInput, SfTextarea } from '@storefront-ui/vue';
 import { useForm, ErrorMessage } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
 import { object, string, boolean } from 'yup';

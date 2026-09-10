@@ -1,0 +1,28 @@
+/* Product / checkout styles — kept out of the global entry CSS so category pages
+   do not pay for PDP layout, Apple Pay, or Google Pay rules on every request. */
+
+.grid-areas-product-page {
+  grid-template-areas: 'left-top right' 'left-bottom right';
+}
+
+.variation-properties {
+  a {
+    color: rgb(var(--colors-2-primary-700));
+  }
+}
+
+apple-pay-button {
+  --apple-pay-button-width: 100%;
+  --apple-pay-button-height: 50px;
+  --apple-pay-button-border-radius: 7px;
+  --apple-pay-button-box-sizing: border-box;
+}
+
+#google-pay-button {
+  div {
+    button {
+      width: 100% !important;
+      display: block;
+    }
+  }
+}

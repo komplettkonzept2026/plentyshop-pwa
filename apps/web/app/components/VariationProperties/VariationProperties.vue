@@ -43,3 +43,7 @@ const componentsMapper: ComponentsMapper = {
   date: VariationPropertyDate,
 };
 </script>
+
+<style lang="scss">
+@use '~/assets/style-product.scss';
+</style>

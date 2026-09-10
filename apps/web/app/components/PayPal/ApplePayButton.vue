@@ -47,3 +47,7 @@ watch(payPalScript, async () => {
   await renderButton();
 });
 </script>
+
+<style lang="scss">
+@use '~/assets/style-product.scss';
+</style>
