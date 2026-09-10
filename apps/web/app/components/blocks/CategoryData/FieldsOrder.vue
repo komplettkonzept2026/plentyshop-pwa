@@ -11,7 +11,7 @@
     <h2
       v-for="(heading, headingIndex) in seoHeadings"
       :key="`seo-h2-${headingIndex}`"
-      class="font-semibold text-lg leading-snug break-words hyphens-auto xs:text-xl sm:text-2xl max-w-full"
+      class="font-medium text-base leading-snug break-words hyphens-auto text-neutral-700 xs:text-lg sm:text-xl max-w-full"
       data-testid="category-seo-h2"
     >
       {{ heading }}

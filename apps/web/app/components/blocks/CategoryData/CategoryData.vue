@@ -109,7 +109,26 @@ const { hexToRgba, getTextAlignment, getContentPosition, isMobile } = useBlockCo
 const { data: productsCatalog } = useProducts();
 const { disableActions } = useEditor();
 const category = computed(() => productsCatalog.value.category || ({} as Category));
-const seoHeadings = computed(() => getCategorySeoH2s(route.path, locale.value));
+/**
+ * Prefer a single SEO H2 per page:
+ * - description1/description2 blocks (usually below products)
+ * - else name-only header blocks (default/single CategoryData templates)
+ * Skip name + shortDescription-only headers so the below-products block keeps the H2.
+ */
+const pathSeoH2s = computed(() => getCategorySeoH2s(route.path, locale.value));
+const seoHeadings = computed(() => {
+  const headings = pathSeoH2s.value;
+  if (!headings.length) return [];
+
+  const fields = props.content.fields || {};
+  const showsName = !!fields.name;
+  const showsPrimaryDescription = !!(fields.description1 || fields.description2);
+  const showsShortDescription = !!fields.shortDescription;
+
+  if (showsPrimaryDescription) return headings;
+  if (showsName && !showsPrimaryDescription && !showsShortDescription) return headings;
+  return [];
+});
 const enabledText = computed(
   () =>
     (props.content.fields.name && details.value.name) ||
@@ -131,7 +150,7 @@ const details = computed(() => categoryGetters.getCategoryDetails(category.value
 const texts = computed<CategoryData>(() => {
   const fields = props.content.fields || {};
   const detailsText = details.value || ({} as CategoryDetails);
-  const maybeStripH2 = (html: string) => (seoHeadings.value.length ? stripHtmlH2Tags(html) : html);
+  const maybeStripH2 = (html: string) => (pathSeoH2s.value.length ? stripHtmlH2Tags(html) : html);
   return {
     name: fields.name && detailsText.name ? detailsText.name : '',
     description1: fields.description1 && detailsText.description ? maybeStripH2(detailsText.description) : '',
