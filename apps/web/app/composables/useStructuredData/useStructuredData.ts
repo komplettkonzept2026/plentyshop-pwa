@@ -13,7 +13,7 @@ import { productGetters, reviewGetters, productSeoSettingsGetters } from '@plent
 import type { Product, CanonicalAlternate } from '@plentymarkets/shop-api';
 import { paths } from '~/utils/paths';
 import { CATEGORY_FAQ_SCHEMA_BY_PATH } from '~/utils/seo/categoryFaqSchema.data';
-import { normalizePagePath } from '~/utils/seo/pageTitleOverrides';
+import { normalizePagePath } from '~/utils/seo/normalizePagePath';
 
 const ORGANIZATION_LOGO =
   'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg';
