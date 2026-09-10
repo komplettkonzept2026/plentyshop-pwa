@@ -42,9 +42,10 @@
             </button>
           </div>
 
-          <!-- Nested children stay out of the initial HTML until expanded. -->
+          <!-- Nested category links stay in SSR HTML for crawl paths; only visibility is toggled. -->
           <ul
-            v-if="isExpanded(index) && categoryTreeGetters.getItems(categoryItem)?.length"
+            v-show="isExpanded(index)"
+            v-if="categoryTreeGetters.getItems(categoryItem)?.length"
             class="w-full pl-4 border-l-2 border-neutral-200 ml-4 mb-3 block clear-both"
           >
             <CategoryTreeItem
