@@ -17,6 +17,15 @@ describe('categoryH2Overrides', () => {
     ]);
   });
 
+  it('returns staging Industriebedarf H2 for the sole master-staging category path', () => {
+    expect(getCategorySeoH2s('/industriebedarf', 'de')).toEqual([
+      'Industriebedarf günstig online kaufen - große Auswahl für Profis',
+    ]);
+    expect(getCategorySeoH2s('/industriebedarf/', 'en')).toEqual([
+      'Buy industrial supplies online at great prices - a wide selection for professionals',
+    ]);
+  });
+
   it('returns English copy when the locale is en', () => {
     expect(getCategorySeoH2s('/lagerlogistik', 'en')).toEqual([
       'Solutions for efficient warehouse logistics and optimized goods movement',

@@ -113,6 +113,10 @@ export const CATEGORY_SEO_H2_OVERRIDES: Record<string, CategorySeoH2Copy> = {
     de: ["Heimwerker-, Haus- und Gartenbedarf für Renovierung, Reparatur und Gestaltung"],
     en: ["DIY, Home and Garden Supplies for Renovation, Repairs and Design"],
   },
+  "/industriebedarf": {
+    de: ["Industriebedarf günstig online kaufen - große Auswahl für Profis"],
+    en: ["Buy industrial supplies online at great prices - a wide selection for professionals"],
+  },
   "/kategorie": {
     de: ["industriebedarf günstig online kaufen - große Auswahl für Profis"],
     en: ["Buy industrial supplies online at great prices - a wide selection for professionals"],
