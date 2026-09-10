@@ -41,8 +41,13 @@ describe('categoryH2Overrides', () => {
     expect(headings[4]).toBe('Häufige Fragen zu Bürobedarf und Computerzubehör');
   });
 
-  it('returns nothing for pending (unapproved) warehouse subcategories', () => {
-    expect(getCategorySeoH2s('/lagerlogistik/lagerkaesten', 'de')).toEqual([]);
+  it('returns the latest approved H2 for warehouse subcategories', () => {
+    expect(getCategorySeoH2s('/lagerlogistik/lagerkaesten', 'de')).toEqual([
+      'Lagerkästen und Behältersysteme für Lager, Werkstatt und Industrie',
+    ]);
+    expect(getCategorySeoH2s('/lagerlogistik/regale', 'de')).toEqual([
+      'Regalsysteme für Lager, Werkstatt, Betrieb und Industrie',
+    ]);
   });
 
   it('strips existing H2 markup from Plenty category HTML', () => {
