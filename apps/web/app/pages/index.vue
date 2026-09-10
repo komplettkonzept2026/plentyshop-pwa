@@ -42,6 +42,7 @@ setRobotForStaticPage('Homepage');
 const { setBlocksListContext } = useBlocksList();
 setBlocksListContext('content');
 
-const { setWebsiteMeta } = useStructuredData();
+const { setWebsiteMeta, setLocalBusinessMeta } = useStructuredData();
 setWebsiteMeta();
+setLocalBusinessMeta();
 </script>
