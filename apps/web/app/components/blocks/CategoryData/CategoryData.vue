@@ -26,6 +26,7 @@
           :fields="props.content.fields"
           :fields-order="props.content.fieldsOrder"
           :texts="texts"
+          :seo-headings="seoHeadings"
         />
       </div>
     </template>
@@ -81,6 +82,7 @@
               :fields="props.content.fields"
               :fields-order="props.content.fieldsOrder"
               :texts="texts"
+              :seo-headings="seoHeadings"
             />
           </div>
         </div>
@@ -94,23 +96,27 @@ import { type Category, categoryGetters } from '@plentymarkets/shop-api';
 import type { CategoryData, CategoryDataProps } from '~/components/blocks/CategoryData/types';
 import type { CategoryDetails } from '@plentymarkets/shop-api/server/types';
 import FieldsOrder from './FieldsOrder.vue';
+import { getCategorySeoH2s, stripHtmlH2Tags } from '~/utils/seo/categoryH2Overrides';
 
 const runtimeConfig = useRuntimeConfig();
 
 const props = defineProps<CategoryDataProps>();
 const route = useRoute();
+const { locale } = useI18n();
 const viewport = useViewport();
 const isCategoryListingPage = computed(() => route.meta.type === 'category');
 const { hexToRgba, getTextAlignment, getContentPosition, isMobile } = useBlockContentHelper();
 const { data: productsCatalog } = useProducts();
 const { disableActions } = useEditor();
 const category = computed(() => productsCatalog.value.category || ({} as Category));
+const seoHeadings = computed(() => getCategorySeoH2s(route.path, locale.value));
 const enabledText = computed(
   () =>
     (props.content.fields.name && details.value.name) ||
     (props.content.fields.description1 && details.value.description) ||
     (props.content.fields.description2 && details.value.description2) ||
-    (props.content.fields.shortDescription && details.value.shortDescription),
+    (props.content.fields.shortDescription && details.value.shortDescription) ||
+    seoHeadings.value.length > 0,
 );
 const showNoTextMessage = computed(() => !enabledText.value);
 const { $isPreview } = useNuxtApp();
@@ -125,17 +131,25 @@ const details = computed(() => categoryGetters.getCategoryDetails(category.value
 const texts = computed<CategoryData>(() => {
   const fields = props.content.fields || {};
   const detailsText = details.value || ({} as CategoryDetails);
+  const maybeStripH2 = (html: string) => (seoHeadings.value.length ? stripHtmlH2Tags(html) : html);
   return {
     name: fields.name && detailsText.name ? detailsText.name : '',
-    description1: fields.description1 && detailsText.description ? detailsText.description : '',
-    description2: fields.description2 && detailsText.description2 ? detailsText.description2 : '',
-    shortDescription: fields.shortDescription && detailsText.shortDescription ? detailsText.shortDescription : '',
+    description1: fields.description1 && detailsText.description ? maybeStripH2(detailsText.description) : '',
+    description2: fields.description2 && detailsText.description2 ? maybeStripH2(detailsText.description2) : '',
+    shortDescription:
+      fields.shortDescription && detailsText.shortDescription ? maybeStripH2(detailsText.shortDescription) : '',
   };
 });
 
 const detailsReady = computed(() => {
   const textsData = texts.value;
-  return !!(textsData.name || textsData.description1 || textsData.description2 || textsData.shortDescription);
+  return !!(
+    textsData.name ||
+    textsData.description1 ||
+    textsData.description2 ||
+    textsData.shortDescription ||
+    seoHeadings.value.length
+  );
 });
 const imagePath = computed(() => {
   if (props.content.displayCategoryImage === 'image-1') {
