@@ -2,6 +2,8 @@ import type {
   useStructuredDataReturn,
   SetLogoMeta,
   SetWebsiteMeta,
+  SetLocalBusinessMeta,
+  SetCategoryFaqMeta,
   SetProductMetaData,
   SetProductRobotsMetaData,
   SetProductCanonicalMetaData,
@@ -10,6 +12,8 @@ import type {
 import { productGetters, reviewGetters, productSeoSettingsGetters } from '@plentymarkets/shop-api';
 import type { Product, CanonicalAlternate } from '@plentymarkets/shop-api';
 import { paths } from '~/utils/paths';
+import { CATEGORY_FAQ_SCHEMA_BY_PATH } from '~/utils/seo/categoryFaqSchema.data';
+import { normalizePagePath } from '~/utils/seo/normalizePagePath';
 
 const ORGANIZATION_LOGO =
   'https://cdn03.plentymarkets.com/evlxcyoplb75/frontend/BestTrade/Logos/Logo_ohne_GmbH.jpg';
@@ -158,6 +162,82 @@ export const useStructuredData: useStructuredDataReturn = () => {
     });
 
     state.value.loading = false;
+  };
+
+  /**
+   * LocalBusiness JSON-LD for the homepage (Schema sheet).
+   */
+  const setLocalBusinessMeta: SetLocalBusinessMeta = () => {
+    state.value.loading = true;
+
+    const runtimeConfig = useRuntimeConfig();
+    const domain = normalizeDomain(String(runtimeConfig.public.domain || 'https://www.komplett-konzept.de'));
+    const logoUrl = `${domain}/_nuxt-plenty/images/logo-header.webp`;
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      '@id': `${domain}/#localbusiness`,
+      name: 'Komplett Konzept Verwertungs GmbH',
+      url: `${domain}/`,
+      logo: logoUrl,
+      image: logoUrl,
+      telephone: '+49 2862 587950',
+      faxNumber: '+49 2862 5879529',
+      email: 'info@komplett-konzept.de',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Dunkerstr. 29',
+        addressLocality: 'Borken',
+        postalCode: '46325',
+        addressCountry: 'DE',
+      },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '08:00',
+          closes: '16:30',
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: 'Saturday',
+          opens: '09:00',
+          closes: '13:00',
+        },
+      ],
+    };
+
+    useHead({
+      script: [
+        {
+          key: 'ld-localbusiness',
+          type: 'application/ld+json',
+          innerHTML: JSON.stringify(structuredData),
+        },
+      ],
+    });
+
+    state.value.loading = false;
+  };
+
+  /**
+   * FAQPage JSON-LD for approved category paths from the Schema sheet.
+   */
+  const setCategoryFaqMeta: SetCategoryFaqMeta = (pathOrUrl) => {
+    const path = normalizePagePath(pathOrUrl).toLowerCase();
+    const structuredData = CATEGORY_FAQ_SCHEMA_BY_PATH[path];
+    if (!structuredData) return;
+
+    useHead({
+      script: [
+        {
+          key: `ld-faq-${path}`,
+          type: 'application/ld+json',
+          innerHTML: JSON.stringify(structuredData),
+        },
+      ],
+    });
   };
 
   /**
@@ -403,6 +483,8 @@ export const useStructuredData: useStructuredDataReturn = () => {
   return {
     setLogoMeta,
     setWebsiteMeta,
+    setLocalBusinessMeta,
+    setCategoryFaqMeta,
     setProductMetaData,
     setProductRobotsMetaData,
     setProductCanonicalMetaData,
