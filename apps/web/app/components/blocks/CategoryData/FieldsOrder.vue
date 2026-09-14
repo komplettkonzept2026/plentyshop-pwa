@@ -1,18 +1,25 @@
 <template>
   <div class="flex w-full min-w-0 max-w-full flex-col gap-2 sm:gap-3">
+    <h1
+      v-if="fields?.name && texts.name"
+      id="category-headline"
+      class="font-bold text-xl leading-tight break-words hyphens-auto xs:text-2xl sm:typography-headline-4 md:typography-headline-3 lg:typography-headline-2 max-w-full"
+      data-testid="category-name"
+    >
+      {{ texts.name }}
+    </h1>
+    <h2
+      v-for="(heading, headingIndex) in seoHeadings"
+      :key="`seo-h2-${headingIndex}`"
+      class="font-medium text-base leading-snug break-words hyphens-auto text-neutral-700 xs:text-lg sm:text-xl max-w-full"
+      data-testid="category-seo-h2"
+    >
+      {{ heading }}
+    </h2>
     <template v-for="key in renderOrder" :key="key">
-      <template v-if="fields?.[key]">
-        <h1
-          v-if="key === 'name' && texts.name"
-          id="category-headline"
-          class="font-bold text-xl leading-tight break-words hyphens-auto xs:text-2xl sm:typography-headline-4 md:typography-headline-3 lg:typography-headline-2 max-w-full"
-          data-testid="category-name"
-        >
-          {{ texts.name }}
-        </h1>
-
+      <template v-if="fields?.[key] && key !== 'name'">
         <div
-          v-else-if="key === 'description1' && texts.description1"
+          v-if="key === 'description1' && texts.description1"
           class="category-description"
           data-testid="category-description-1"
           v-html="texts.description1"
@@ -48,7 +55,10 @@ const props = defineProps<{
   fields: CategoryDataFieldsVisibility;
   fieldsOrder: CategoryDataFieldKey[];
   texts: CategoryData;
+  seoHeadings?: string[];
 }>();
+
+const seoHeadings = computed(() => props.seoHeadings ?? []);
 
 const renderOrder = computed<CategoryDataFieldKey[]>(() =>
   props.fieldsOrder?.length
