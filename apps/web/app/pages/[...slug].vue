@@ -29,6 +29,7 @@ const { getFacetsFromURL, checkFiltersInURL } = useCategoryFilter();
 const { fetchProducts, data: productsCatalog, loading } = useProducts();
 const { data: categoryTree } = useCategoryTree();
 const { buildCategoryLanguagePath } = useLocalization();
+const { setCategoryFaqMeta } = useStructuredData();
 
 const identifier = computed(() =>
   productsCatalog.value.category?.type === 'content' ? productsCatalog.value.category?.id : 0,
@@ -73,6 +74,7 @@ await handleQueryUpdate();
 
 setCategoriesPageMeta(productsCatalog.value, getFacetsFromURL(), canonicalDb);
 setBlocksListContext(productsCatalog.value.category.type === 'item' ? 'productCategory' : 'content');
+setCategoryFaqMeta(route.path);
 const { setPageMeta } = usePageMeta();
 const categoryName = computed(() => categoryGetters.getCategoryName(productsCatalog.value.category));
 const icon = 'sell';
