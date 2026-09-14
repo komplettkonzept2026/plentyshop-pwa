@@ -14,10 +14,8 @@
 
       <SfLink
         :tag="NuxtLink"
-        rel="preload"
         :to="productPath"
         :class="[{ 'size-48': isFromSlider }, 'relative group/image flex items-center justify-center']"
-        as="image"
       >
         <NuxtImg
           :src="imageUrl"
@@ -232,7 +230,9 @@ const formattedSecondaryNetPrice = computed(() => {
   return netPrice === null ? '' : format(netPrice);
 });
 
-const cover = computed(() => productGetters.getCoverImage(product.value));
+const cover = computed(
+  () => productGetters.getPreviewImage(product.value) || productGetters.getCoverImage(product.value),
+);
 const secondCover = computed(() => productGetters.getSecondCoverImage(product.value));
 const firstImage = computed(() => productImageGetters.getFirstImage(product.value));
 
@@ -265,7 +265,9 @@ const productPath = computed(() => {
   return localePath(shouldAppendVariation ? `${basePath}_${variationId.value}` : basePath);
 });
 
-const priority = ref((props.index || 0) < 5);
+// Only the first card competes for LCP; the previous index < 5 window made five images
+// fight for fetchpriority=high and delayed the real LCP candidate.
+const priority = ref((props.index || 0) === 0);
 const lazy = ref(props.lazy || false);
 const isFromWishlist = ref(props.isFromWishlist || false);
 const isFromSlider = ref(props.isFromSlider || false);

@@ -1,13 +1,13 @@
-// 1. Change the global default from 50 to 100
-const DEFAULT_ITEMS_PER_PAGE = 100;
+// Rendering 100 products plus the full facet tree server-side produced ~1.8 MB of HTML per
+// category. 36 keeps the grid full on desktop while cutting the document size substantially.
+const DEFAULT_ITEMS_PER_PAGE = 36;
 
 const DEFAULT_FEEDBACK_ITEMS_PER_PAGE = 10;
 const DEFAULT_PAGE = 1;
 const DEFAULT_FEEDBACK_PAGE = 1;
 const DEFAULT_QUICK_CHECKOUT_TIMER = 10;
 
-// 2. Remove the smaller steps, leaving only 100
-const PER_PAGE_STEPS: number[] = [100];
+const PER_PAGE_STEPS: number[] = [24, 36, 48];
 
 const ESSENTIAL_COOKIES_INDEX = 0;
 const REPLY_CHARACTER_LIMIT = 500;

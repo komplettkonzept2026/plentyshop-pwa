@@ -25,13 +25,15 @@
         </template>
 
         <template v-if="key === 'manufacturer' && props.content?.fields.manufacturer">
-          <CategoryFiltersSort
-            v-if="productsCatalog.facets && facetGetters.hasFilters(productsCatalog.facets)"
-            class="mb-1"
-            :facets="productsCatalog.facets"
-            :configuration="content"
-            :render-key="key"
-          />
+          <NuxtLazyHydrate when-idle>
+            <CategoryFiltersSort
+              v-if="productsCatalog.facets && facetGetters.hasFilters(productsCatalog.facets)"
+              class="mb-1"
+              :facets="productsCatalog.facets"
+              :configuration="content"
+              :render-key="key"
+            />
+          </NuxtLazyHydrate>
         </template>
 
         <template v-if="key === 'price' && props.content?.fields.price">
@@ -55,15 +57,17 @@
         </template>
 
         <template v-if="key === 'customizedFilters' && props.content?.fields.customizedFilters">
-          <CategoryFiltersSort
-            v-if="productsCatalog.facets && facetGetters.hasFilters(productsCatalog.facets)"
-            class="mb-1"
-            :facets="productsCatalog.facets"
-            :configuration="content"
-            :render-key="key"
-            :show-all="showAllFiltersImmediately"
-            :limit="numberOfFiltersToShowInitially"
-          />
+          <NuxtLazyHydrate when-idle>
+            <CategoryFiltersSort
+              v-if="productsCatalog.facets && facetGetters.hasFilters(productsCatalog.facets)"
+              class="mb-1"
+              :facets="productsCatalog.facets"
+              :configuration="content"
+              :render-key="key"
+              :show-all="showAllFiltersImmediately"
+              :limit="numberOfFiltersToShowInitially"
+            />
+          </NuxtLazyHydrate>
         </template>
       </template>
     </CategorySidebar>

@@ -35,9 +35,9 @@ const props = defineProps<CategoryItemsPerPageProps & { selectionModeCompact?: b
 const { updateItemsPerPage: updateItemsPerPageFromComposable, getFacetsFromURL } = useCategoryFilter();
 const selectionModeCompact = computed(() => props.selectionModeCompact ?? false);
 
-// 1. Build the options cleanly from your new global defaults
+// 1. Build the options cleanly from global defaults
 const options = computed(() => {
-  // Grab the [100] from defaults.ts
+  // Grab PER_PAGE_STEPS from defaults.ts (24 / 36 / 48)
   const baseOptions = defaults.PER_PAGE_STEPS.map((step) => ({
     label: step.toString(),
     value: step.toString(),
@@ -57,7 +57,7 @@ const options = computed(() => {
 
 const facetsFromURL = getFacetsFromURL();
 
-// 2. Use the global default (100) safely
+// 2. Use the global default (36) safely
 const selectedValue = facetsFromURL.itemsPerPage?.toString() || defaults.DEFAULT_ITEMS_PER_PAGE.toString();
 const selected = ref(selectedValue);
 

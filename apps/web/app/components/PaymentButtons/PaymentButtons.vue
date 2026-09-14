@@ -275,3 +275,7 @@ const validateOnClickComponents = async (event: MouseEvent, component: PaymentBu
   }
 };
 </script>
+
+<style lang="scss">
+@use '~/assets/style-product.scss';
+</style>

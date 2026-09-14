@@ -68,6 +68,7 @@ export default defineNuxtConfig({
       ],
     },
     build: {
+      cssCodeSplit: true,
       rollupOptions: {
         output: {
           manualChunks: {
@@ -76,6 +77,11 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+  // Prefer linked CSS over inlining the full Tailwind+app bundle into every SSR HTML
+  // document. Category pages were already ~1.8 MB; inlined CSS made first paint slower.
+  features: {
+    inlineStyles: false,
   },
   // TODO: build is consistently failing because of this. check whether we need pre-render check.
   nitro: {

@@ -41,9 +41,13 @@
       :class="[...gridClasses, isCategoryListingPage ? 'min-w-0' : '']"
       data-testid="category-grid"
     >
-      <NuxtLazyHydrate v-for="(product, index) in products" :key="productGetters.getVariationId(product)" when-visible>
-        <UiProductCard :product="product" :configuration="content" :index="index" />
-      </NuxtLazyHydrate>
+      <template v-for="(product, index) in products" :key="productGetters.getVariationId(product)">
+        <!-- First two cards hydrate immediately so the LCP image is not deferred behind LazyHydrate. -->
+        <UiProductCard v-if="index < 2" :product="product" :configuration="content" :index="index" />
+        <NuxtLazyHydrate v-else when-visible>
+          <UiProductCard :product="product" :configuration="content" :index="index" />
+        </NuxtLazyHydrate>
+      </template>
     </section>
     <LazyCategoryEmptyState v-else />
     <div v-if="totalProducts > 0" class="mt-4 mb-4 typography-text-xs flex gap-1">
@@ -89,6 +93,7 @@ const localePath = useLocalePath();
 const { t } = useI18n();
 const { showNetPrices } = useCart();
 const { data: productsCatalog, productsPerPage } = useProducts();
+const { addModernImageExtension } = useModernImage();
 
 const props = defineProps<ItemGridProps>();
 const route = useRoute();
@@ -99,6 +104,31 @@ const itemsPerPage = computed(() => Number(productsPerPage.value) || 0);
 const maxVisiblePages = computed(() => (viewport.isGreaterOrEquals('lg') ? 5 : 2));
 const currentPage = computed(() => getFacetsFromURL().page ?? 1);
 const categoryId = computed(() => getFacetsFromURL().categoryUrlPath ?? null);
+
+/**
+ * Category LCP is almost always the first product card image. Preload the smaller preview
+ * derivative (with AVIF/WebP when enabled) so the browser starts the request during HTML parse.
+ */
+const lcpImageUrl = computed(() => {
+  const first = products.value[0];
+  if (!first) return '';
+  const raw = productGetters.getPreviewImage(first) || productGetters.getCoverImage(first);
+  return addModernImageExtension(raw);
+});
+
+useHead(() => ({
+  link: lcpImageUrl.value
+    ? [
+        {
+          key: 'lcp-product-image',
+          rel: 'preload',
+          as: 'image',
+          href: lcpImageUrl.value,
+          fetchpriority: 'high',
+        },
+      ]
+    : [],
+}));
 
 const vatFootnoteLabel = computed(() => {
   const listingShowsGross = products.value.some((product) => hasProductGrossUnitPrice(product));
