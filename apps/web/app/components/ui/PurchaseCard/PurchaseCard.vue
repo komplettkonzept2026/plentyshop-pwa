@@ -262,32 +262,35 @@
                 </template>
               </div>
 
-              <div class="mt-6 mb-4 flex justify-center w-full min-w-0">
-                <UiOptimizedStaticImage
-                  base-src="/_nuxt-plenty/images/wider_version_opt"
-                  fallback-ext="jpg"
-                  alt="Komplett Konzept"
-                  img-class="max-w-full w-auto h-auto object-contain rounded shadow-sm"
-                  :width="400"
-                  :height="251"
-                  loading="lazy"
-                />
-              </div>
-              
-              <!-- Internationale Anfrage CTA -->
-              <div class="mt-4 flex items-center justify-between flex-wrap gap-3 min-w-0">
-                <p class="text-sm m-0 flex-1 min-w-0 text-red-600 font-semibold break-words">
-                  Sie kommen aus dem Ausland und möchten trotzdem leasen oder finanzieren?
-                </p>
-                <NuxtLink
-                  to="/leasing-finanzierung"
-                  class="inline-flex items-center gap-2 px-5 py-3 rounded font-bold text-sm whitespace-nowrap transition-colors hover:opacity-90 no-underline shrink-0"
-                  style="background: #F5C00A; color: #152440;"
-                >
-                  Europaweit anfragen
-                  <span>→</span>
-                </NuxtLink>
-              </div>
+              <!-- Finanzierung/Leasing nur ab LEASINGO_MIN_NET_PRICE netto -->
+              <template v-if="isLeasingEligible">
+                <div class="mt-6 mb-4 flex justify-center w-full min-w-0">
+                  <UiOptimizedStaticImage
+                    base-src="/_nuxt-plenty/images/wider_version_opt"
+                    fallback-ext="jpg"
+                    alt="Komplett Konzept"
+                    img-class="max-w-full w-auto h-auto object-contain rounded shadow-sm"
+                    :width="400"
+                    :height="251"
+                    loading="lazy"
+                  />
+                </div>
+
+                <!-- Internationale Anfrage CTA -->
+                <div class="mt-4 flex items-center justify-between flex-wrap gap-3 min-w-0">
+                  <p class="text-sm m-0 flex-1 min-w-0 text-red-600 font-semibold break-words">
+                    Sie kommen aus dem Ausland und möchten trotzdem leasen oder finanzieren?
+                  </p>
+                  <NuxtLink
+                    to="/leasing-finanzierung"
+                    class="inline-flex items-center gap-2 px-5 py-3 rounded font-bold text-sm whitespace-nowrap transition-colors hover:opacity-90 no-underline shrink-0"
+                    style="background: #F5C00A; color: #152440;"
+                  >
+                    Europaweit anfragen
+                    <span>→</span>
+                  </NuxtLink>
+                </div>
+              </template>
 
               <!-- Leasingo: load third-party calculator only after explicit user action -->
               <div v-if="isLeasingEligible" class="mt-4 min-w-0">
@@ -648,7 +651,7 @@ const leasingNetPrice = computed(() => {
   return (grossPrice / (1 + vatRate / 100)).toFixed(2);
 });
 
-const isLeasingEligible = computed(() => Number(leasingNetPrice.value) > LEASINGO_MIN_NET_PRICE);
+const isLeasingEligible = computed(() => Number(leasingNetPrice.value) >= LEASINGO_MIN_NET_PRICE);
 
 const unloadLeasingoScripts = () => {
   if (typeof window === 'undefined') return;
