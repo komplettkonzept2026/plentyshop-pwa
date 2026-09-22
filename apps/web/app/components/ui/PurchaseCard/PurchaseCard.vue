@@ -262,18 +262,6 @@
                 </template>
               </div>
 
-              <!-- EU-Gewaehrleistungslabel (Pflicht ab 27.09.2026, unveraendert, farbig) -->
-              <div class="mt-6 w-full min-w-0" data-testid="eu-legal-guarantee-notice">
-                <img
-                  :src="legalGuaranteeNoticeSrc"
-                  :alt="legalGuaranteeNoticeAlt"
-                  class="block w-full h-auto"
-                  width="595"
-                  height="842"
-                  loading="lazy"
-                />
-              </div>
-
               <!-- Finanzierung/Leasing nur ab LEASINGO_MIN_NET_PRICE netto -->
               <template v-if="isLeasingEligible">
                 <div class="mt-6 mb-4 flex justify-center w-full min-w-0">
@@ -327,6 +315,18 @@
                   data-object-condition="1"
                   :data-category="widgetMainCategory"
                   :data-subcategory="widgetSubCategory"
+                />
+              </div>
+
+              <!-- EU-Gewaehrleistungslabel (Pflicht ab 27.09.2026, unveraendert, farbig) -->
+              <div class="mt-6 w-full min-w-0" data-testid="eu-legal-guarantee-notice">
+                <img
+                  :src="legalGuaranteeNoticeSrc"
+                  :alt="legalGuaranteeNoticeAlt"
+                  class="block w-full h-auto"
+                  width="595"
+                  height="842"
+                  loading="lazy"
                 />
               </div>
             </template>
