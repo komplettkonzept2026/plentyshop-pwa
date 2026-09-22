@@ -1,6 +1,6 @@
 <template>
   <NuxtErrorBoundary>
-    <div class="relative w-full group">
+    <div class="kk-hero relative w-full group">
 
      <div class="absolute inset-0 z-[20] flex flex-col items-center justify-center pointer-events-none h-full w-full">
         <div 
@@ -368,6 +368,54 @@ watch(
 );
 </script>
 
-<!-- <style src="./styles/navigation.min.css"></style>
-<style src="./styles/pagination.min.css"></style>
-<style src="./styles/swiper.min.css"></style> -->
+<style scoped>
+/* Feste Banner-Hoehe je Geraet */
+.kk-hero {
+  --kk-hero-h: 320px;
+}
+
+@media (min-width: 768px) {
+  .kk-hero {
+    --kk-hero-h: 360px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .kk-hero {
+    --kk-hero-h: 420px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .kk-hero {
+    --kk-hero-h: 460px;
+  }
+}
+
+.kk-hero :deep(.swiper),
+.kk-hero :deep(.swiper-slide) {
+  height: var(--kk-hero-h) !important;
+  max-height: none !important;
+}
+
+.kk-hero :deep(.swiper-slide) {
+  overflow: hidden;
+}
+
+.kk-hero :deep(.swiper-slide > *),
+.kk-hero :deep(.swiper-slide *:has(img)) {
+  height: 100% !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+}
+
+.kk-hero :deep(.swiper-slide picture),
+.kk-hero :deep(.swiper-slide img) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover;
+  object-position: center;
+}
+</style>
