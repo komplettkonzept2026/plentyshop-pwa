@@ -3,11 +3,10 @@
     class="sticky-contact fixed z-[90] flex w-max max-w-[calc(100vw-1rem)]
            left-1/2 -translate-x-1/2 flex-row justify-center gap-2 p-2 bg-white/95 backdrop-blur-md shadow-[0_5px_20px_rgba(0,0,0,0.12)] rounded-full
            sm:gap-3
-           md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-auto md:right-0 md:translate-x-0 md:max-w-none md:flex-col md:gap-2 md:p-0 md:bg-transparent md:shadow-none md:backdrop-blur-none md:rounded-none
+           md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-auto md:right-0 md:translate-x-0 md:max-w-none md:flex-col md:items-end md:gap-2 md:p-0 md:bg-transparent md:shadow-none md:backdrop-blur-none md:rounded-none
            lg:gap-2.5 xl:gap-3 min-[1367px]:gap-3.5"
   >
-    <a
-      href="tel:+4902862587950"
+    <a href="tel:+4902862587950"
       class="sticky-btn flex items-center justify-center text-white bg-[#3B82F6] shadow-md transition-all duration-300
              w-10 h-10 rounded-full hover:bg-[#2563EB]
              sm:w-11 sm:h-11
@@ -34,8 +33,7 @@
       >Ruf uns an!</span>
     </a>
 
-    <a
-      href="mailto:info@komplett-konzept.de"
+    <a href="mailto:info@komplett-konzept.de"
       class="sticky-btn flex items-center justify-center text-white bg-[#F09F39] shadow-md transition-all duration-300
              w-10 h-10 rounded-full hover:bg-[#D9822B]
              sm:w-11 sm:h-11
@@ -62,8 +60,7 @@
       >Schreib uns!</span>
     </a>
 
-    <a
-      href="https://wa.me/+4901772711119"
+    <a href="https://wa.me/+4901772711119"
       target="_blank"
       rel="noopener noreferrer"
       class="sticky-btn flex items-center justify-center text-white bg-[#62D071] shadow-md transition-all duration-300
@@ -98,6 +95,24 @@
 @media (min-width: 768px) {
   .sticky-contact {
     bottom: auto;
+  }
+
+  .sticky-btn {
+    gap: 0 !important;
+  }
+
+  .sticky-label {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-width 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+  }
+
+  .sticky-btn:hover .sticky-label,
+  .sticky-btn:focus-visible .sticky-label {
+    max-width: 240px;
+    opacity: 1;
+    margin-left: 0.625rem;
   }
 }
 
