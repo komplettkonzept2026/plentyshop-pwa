@@ -6,8 +6,7 @@
            md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-auto md:right-0 md:translate-x-0 md:max-w-none md:flex-col md:items-end md:gap-2 md:p-0 md:bg-transparent md:shadow-none md:backdrop-blur-none md:rounded-none
            lg:gap-2.5 xl:gap-3 min-[1367px]:gap-3.5"
   >
-    
-      href="tel:+4902862587950"
+    <a href="tel:+4902862587950"
       class="sticky-btn flex items-center justify-center text-white bg-[#3B82F6] shadow-md transition-all duration-300
              w-10 h-10 rounded-full hover:bg-[#2563EB]
              sm:w-11 sm:h-11
@@ -34,8 +33,7 @@
       >Ruf uns an!</span>
     </a>
 
-    
-      href="mailto:info@komplett-konzept.de"
+    <a href="mailto:info@komplett-konzept.de"
       class="sticky-btn flex items-center justify-center text-white bg-[#F09F39] shadow-md transition-all duration-300
              w-10 h-10 rounded-full hover:bg-[#D9822B]
              sm:w-11 sm:h-11
@@ -62,8 +60,7 @@
       >Schreib uns!</span>
     </a>
 
-    
-      href="https://wa.me/+4901772711119"
+    <a href="https://wa.me/+4901772711119"
       target="_blank"
       rel="noopener noreferrer"
       class="sticky-btn flex items-center justify-center text-white bg-[#62D071] shadow-md transition-all duration-300
