@@ -1,4 +1,3 @@
-<!-- eslint-disable no-console -->
 <template>
   <form
     class="md:rounded-md"
@@ -317,6 +316,18 @@
                   :data-subcategory="widgetSubCategory"
                 />
               </div>
+
+              <!-- EU-Gewaehrleistungslabel (Pflicht ab 27.09.2026, unveraendert, farbig) -->
+              <div class="mt-6 pt-6 w-full min-w-0 border-t border-neutral-900" data-testid="eu-legal-guarantee-notice">
+                <img
+                  :src="legalGuaranteeNoticeSrc"
+                  :alt="legalGuaranteeNoticeAlt"
+                  class="block w-full h-auto max-w-[340px]"
+                  width="595"
+                  height="842"
+                  loading="lazy"
+                />
+              </div>
             </template>
 
             <template v-if="key === 'itemText' && configuration?.fields.itemText">
@@ -613,6 +624,19 @@ const manufacturerName = computed(() => {
   return manufacturer?.name || '';
 });
 
+// --- EU-GEWAEHRLEISTUNGSLABEL ---
+const legalGuaranteeNoticeSrc = computed(() =>
+  locale.value?.startsWith('de')
+    ? '/_nuxt-plenty/images/gewaehrleistung-de.svg'
+    : '/_nuxt-plenty/images/gewaehrleistung-en.svg',
+);
+
+const legalGuaranteeNoticeAlt = computed(() =>
+  locale.value?.startsWith('de')
+    ? 'Gesetzliche Gewährleistung: Mindestens zwei Jahre gesetzliche Gewährleistung der Vertragsmäßigkeit für Waren, die in der Europäischen Union verkauft werden.'
+    : 'Legal guarantee: Minimum two-year legal guarantee protection for goods sold in the European Union.',
+);
+
 // const scrollToReviews = () => {
 //   if (!isReviewsAccordionOpen()) {
 //     openReviewsAccordion();
@@ -718,4 +742,28 @@ watch(
   { immediate: true },
 );
 // --- LEASINGO INTEGRATION END ---
+// --- DEBUGGING STOCK ---
+watch(
+  () => props.product,
+  (p) => {
+    // eslint-disable-next-line no-console
+    // console.log('🔍 STOCK CHECK 🔍');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawStock = (p as any)?.stock;
+    // eslint-disable-next-line no-console
+    console.log('Raw Stock Object:', rawStock);
+
+    if (!rawStock) {
+      // eslint-disable-next-line no-console
+      console.warn('⚠️ API is NOT sending stock data. Backend setting is OFF.');
+    } else if (rawStock.net === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn('⚠️ API sent stock object, but "net" is missing/hidden.');
+    } else {
+      // eslint-disable-next-line no-console
+      console.log('✅ SUCCESS! Net Stock is:', rawStock.net);
+    }
+  },
+  { immediate: true, deep: true },
+);
 </script>
