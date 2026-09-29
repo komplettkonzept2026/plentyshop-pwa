@@ -1,3 +1,4 @@
+<!-- eslint-disable no-console -->
 <template>
   <form
     class="md:rounded-md"
@@ -318,7 +319,7 @@
               </div>
 
               <!-- EU-Gewaehrleistungslabel (Pflicht ab 27.09.2026, unveraendert, farbig) -->
-              <div class="mt-6 w-full min-w-0 flex justify-center" data-testid="eu-legal-guarantee-notice">
+              <div class="mt-6 pt-6 w-full min-w-0 border-t border-neutral-900" data-testid="eu-legal-guarantee-notice">
                 <img
                   :src="legalGuaranteeNoticeSrc"
                   :alt="legalGuaranteeNoticeAlt"
